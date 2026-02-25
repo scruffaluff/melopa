@@ -1,0 +1,94 @@
+# Python configuration file for building, dependencies, and tooling.
+#
+# For more information, visit
+# https://snarky.ca/what-the-heck-is-pyproject-toml.
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling~=1.0"]
+
+[dependency-groups]
+dev = [
+  "coverage~=7.13",
+  "jinja2-cli>=1.0.0",
+  "pytest~=9.0",
+  "pytest-cov~=7.0",
+  "pytest-mock~=3.15",
+  "pyzmq~=27.1",
+  "ruff~=0.15.1",
+  "ty~=0.0.16",
+]
+
+[project]
+# Dependency constraints must be flexible for WASM compatibility with Micropip.
+dependencies = [
+  "bokeh~=3.6",
+  "marimo~=0.20.2",
+  "numpy~=2.0",
+  "plotly~=6.5",
+  "scipy~=1.14",
+  "soundfile~=0.13.0",
+]
+description = "Personal collection of notes, tutorials and workbooks."
+keywords = []
+name = "melopa"
+readme = "README.md"
+requires-python = ">=3.12.0,<4.0.0"
+version = "0.1.0"
+
+[tool.coverage.report]
+exclude_lines = [
+  "if sys.version_info.*",
+  "pragma: no cover",
+  "raise NotImplementedError",
+]
+fail_under = 0
+show_missing = true
+
+[tool.coverage.run]
+branch = true
+command_line = "-m pytest"
+omit = []
+source = ["melopa"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/melopa"]
+
+[tool.marimo]
+display = { custom_css = ["data/marimo.css"] }
+runtime = { output_max_bytes = 1_000_000_000 }
+
+[tool.pytest]
+addopts = ["-sv"]
+cache_dir = ".vendor/cache/pytest"
+markers = ["e2e: mark as end to end test.", "unit: mark as unit test."]
+python_files = ["__init__.py", "*_test.py"]
+testpaths = ["src", "test"]
+
+[tool.ruff]
+cache-dir = ".vendor/cache/ruff"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+flake8-annotations = { allow-star-arg-any = true }
+pydocstyle = { convention = "google" }
+ignore = [
+  "COM",     # Rule conflicts with formatter.
+  "EXE003",  # Uv should be shebang executor.
+  "FBT",     # Boolean function arguments are acceptable.
+  "FIX",     # Todo comments are acceptable.
+  "ICN",     # Import abbreviations reduce readability.
+  "PLR2004", # Constant numerical comparisons are often readable.
+  "S101",    # Assert statements are standard for test functions.
+  "S603",    # Rule warns about using subprocess commands without a solution.
+  "S607",    # Partial paths for process executables is more cross platform.
+  "T201",    # Print statements are acceptable for CLI applications.
+  "T203",    # Print statements are acceptable for CLI applications.
+  "TD",      # Todo formatting is excessive for personal projects.
+]
+select = ["ALL"]
+
+[tool.ty]
+terminal = { error-on-warning = true }
