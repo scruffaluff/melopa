@@ -6,7 +6,9 @@ header: |-
   # /// script
   # dependencies = [
   #   "bokeh~=3.6",
+  #   "matplotlib~=3.8",
   #   "numpy~=2.2",
+  #   "plotly~=6.5",
   #   "scipy~=1.14",
   # ]
   # requires-python = ">=3.12.0,<4.0.0"
@@ -27,7 +29,7 @@ import marimo as mo
 import numpy
 from numpy.typing import NDArray
 import melopa
-from melopa.plot import Kind
+import melopa.plot
 ```
 
 Dynamic range compressors decrease an audio signal's dynamic range by
@@ -79,13 +81,11 @@ code
 state, audio = melopa.audio_selector("templeofhades-scratch_sample.wav")
 ratio = mo.ui.slider(0, 100, 0.1, label="Ratio", show_value=True, value=4.0)
 threshold = mo.ui.slider(0, 1, 0.01, label="Threshold", show_value=True, value=0.8)
-visual = melopa.plot_selector()
 
 mo.ui.tabs(
     {
         "File": audio,
         "Parameter": mo.hstack([ratio, threshold], gap=2, justify="start"),
-        "Visual": visual,
     },
     label="Controls"
 )
@@ -98,13 +98,16 @@ exec(f"{code.value}\nprocessed = compress(signal)")
 ```
 
 ```python {.marimo}
+visual = melopa.plot.select()
+mo.right(visual)
+```
+
+```python {.marimo}
 plot = melopa.plot.signal([
     {"rate": rate, "y": signal, "legend_label": "original"},
     {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
-    backend=visual.value["backend"].lower(),
-    kind=Kind(visual.value["kind"].lower()),
-    overlay=visual.value["overlay"],
+    config=visual,
     title=source.name(),
 )
 plot

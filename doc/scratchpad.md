@@ -7,12 +7,11 @@ header: |-
   # dependencies = [
   #   "bokeh~=3.6",
   #   "librosa~=0.11.0",
-  #   "matplotlib~=3.10",
+  #   "matplotlib~=3.8",
   #   "numpy~=2.2",
   #   "polars~=1.36",
   #   "plotly~=6.5",
   #   "scipy~=1.14",
-  #   "soundfile~=0.13.0",
   # ]
   # requires-python = ">=3.12.0,<4.0.0"
   #

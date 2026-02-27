@@ -57,7 +57,17 @@ packages = ["src/melopa"]
 
 [tool.marimo]
 display = { custom_css = ["data/marimo.css"] }
-runtime = { output_max_bytes = 1_000_000_000 }
+formatting = { line_length = 80 }
+
+[tool.marimo.keymap.overrides]
+"cell.complete" = "Ctrl-i"
+"cell.toggleComment" = "Ctrl-/"
+"completion.moveDown" = "Ctrl-n"
+"completion.moveUp" = "Ctrl-p"
+
+[tool.marimo.runtime]
+auto_instantiate = true
+output_max_bytes = 1000000000
 
 [tool.pytest]
 addopts = ["-sv"]

@@ -1,17 +1,16 @@
 """Plotting interfaces."""
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, NamedTuple, cast
+
+import marimo
+from marimo import Html
 
 from melopa.plot import bokeh, matplotlib, plotly
 
 
-class Kind(StrEnum):
-    """Plot types."""
-
-    Spectrogram = "spectrogram"
-    Spectrum = "spectrum"
-    Waveform = "waveform"
+class Options(StrEnum):
+    """Interface for selection options."""
 
     @classmethod
     def options(cls) -> list[str]:
@@ -19,22 +18,75 @@ class Kind(StrEnum):
         return [kind.value for kind in cls]
 
 
+class Backend(Options):
+    """Plot backends."""
+
+    Bokeh = "Bokeh"
+    Matplotlib = "Matplotlib"
+    Plotly = "Plotly"
+
+
+class Kind(Options):
+    """Plot types."""
+
+    Spectrogram = "Spectrogram"
+    Spectrum = "Spectrum"
+    Waveform = "Waveform"
+
+
+class Config(NamedTuple):
+    """Plot settings."""
+
+    backend: Backend = Backend.Bokeh
+    kind: Kind = Kind.Waveform
+    overlay: bool = True
+
+
+def select() -> marimo.ui.batch:
+    """Marimo element to select a signal plot settings."""
+    backend = marimo.ui.dropdown(
+        Backend.options(),
+        allow_select_none=False,
+        label="Backend",
+        value="Bokeh",
+    )
+    kind = marimo.ui.dropdown(
+        Kind.options(),
+        allow_select_none=False,
+        label="Type",
+        value="Waveform",
+    )
+    overlay = marimo.ui.switch(label="Overlay", value=True)
+    return Html("<div>{backend}{kind}{overlay}</div>").batch(
+        backend=backend,  # ty:ignore[invalid-argument-type]
+        kind=kind,  # ty:ignore[invalid-argument-type]
+        overlay=overlay,  # ty:ignore[invalid-argument-type]
+    )
+
+
 def signal(
     signals: list[dict],
-    backend: str = "bokeh",
-    kind: Kind = Kind.Waveform,
+    config: marimo.ui.batch | None = None,
     **kwargs: Any,
-) -> Any:  # noqa: ANN401
+) -> Html:
     """Plot audio signals."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib, "plotly": plotly}[backend]
+    if config is None:
+        config_ = Config()
+    elif isinstance(config, Config):
+        config_ = config
+    else:
+        config_ = Config(**cast("dict", config.value))
+    module = {"Bokeh": bokeh, "Matplotlib": matplotlib, "Plotly": plotly}[
+        config_.backend
+    ]
 
-    match kind:
+    match config_.kind:
         case Kind.Spectrogram:
-            return module.spectrogram(signals, **kwargs)
+            return module.spectrogram(signals, config_.overlay, **kwargs)
         case Kind.Spectrum:
-            return module.spectrum(signals, **kwargs)
+            return module.spectrum(signals, config_.overlay, **kwargs)
         case Kind.Waveform:
-            return module.waveform(signals, **kwargs)
+            return module.waveform(signals, config_.overlay, **kwargs)
         case _:
-            message = f"Invalid choice '{kind}' for PlotKind."
+            message = f"Invalid choice '{config.kind_}' for PlotKind."
             raise ValueError(message)
