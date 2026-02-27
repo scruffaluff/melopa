@@ -79,14 +79,13 @@ code
 state, audio = melopa.audio_selector("templeofhades-scratch_sample.wav")
 ratio = mo.ui.slider(0, 100, 0.1, label="Ratio", show_value=True, value=4.0)
 threshold = mo.ui.slider(0, 1, 0.01, label="Threshold", show_value=True, value=0.8)
-kind = mo.ui.dropdown(Kind.options(), allow_select_none=False, label="Type", value="waveform")
-overlay = mo.ui.switch(label="Overlay", value=True)
+visual = melopa.plot_selector()
 
 mo.ui.tabs(
     {
         "File": audio,
         "Parameter": mo.hstack([ratio, threshold], gap=2, justify="start"),
-        "Visual": mo.hstack([kind, overlay], gap=2, justify="start"),
+        "Visual": visual,
     },
     label="Controls"
 )
@@ -103,8 +102,9 @@ plot = melopa.plot.signal([
     {"rate": rate, "y": signal, "legend_label": "original"},
     {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
-    kind=Kind(kind.value),
-    overlay=overlay.value,
+    backend=visual.value["backend"].lower(),
+    kind=Kind(visual.value["kind"].lower()),
+    overlay=visual.value["overlay"],
     title=source.name(),
 )
 plot

@@ -3,13 +3,14 @@
 from enum import StrEnum
 from typing import Any
 
-from melopa.plot import bokeh, plotly
+from melopa.plot import bokeh, matplotlib, plotly
 
 
 class Kind(StrEnum):
     """Plot types."""
 
-    Frequency = "frequency"
+    Spectrogram = "spectrogram"
+    Spectrum = "spectrum"
     Waveform = "waveform"
 
     @classmethod
@@ -25,11 +26,13 @@ def signal(
     **kwargs: Any,
 ) -> Any:  # noqa: ANN401
     """Plot audio signals."""
-    module = {"bokeh": bokeh, "plotly": plotly}[backend]
+    module = {"bokeh": bokeh, "matplotlib": matplotlib, "plotly": plotly}[backend]
 
     match kind:
-        case Kind.Frequency:
-            return module.frequency(signals, **kwargs)
+        case Kind.Spectrogram:
+            return module.spectrogram(signals, **kwargs)
+        case Kind.Spectrum:
+            return module.spectrum(signals, **kwargs)
         case Kind.Waveform:
             return module.waveform(signals, **kwargs)
         case _:

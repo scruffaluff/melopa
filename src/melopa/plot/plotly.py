@@ -7,8 +7,18 @@ from plotly.graph_objects import Figure, Layout, Scattergl
 from plotly.graph_objs.layout import Legend
 
 
+def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
+    """Plot audio frequency time heatmap with Plotly."""
+    raise NotImplementedError
+
+
+def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
+    """Plot audio frequency spectrum with Plotly."""
+    raise NotImplementedError
+
+
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:  # noqa: ARG001
-    """Plot audio waveform with Bokeh."""
+    """Plot audio waveform with Plotly."""
     plot = Figure(
         layout=Layout(
             legend=Legend(orientation="h", y=-0.2, yanchor="top"),

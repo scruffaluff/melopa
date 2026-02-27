@@ -21,8 +21,6 @@ header: |-
   # ///
 ---
 
-# Scratchpad
-
 ```python {.marimo name="setup"}
 import sys
 if sys.platform == "emscripten":

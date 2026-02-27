@@ -24,6 +24,7 @@ dev = [
 dependencies = [
   "bokeh~=3.6",
   "marimo~=0.20.2",
+  "matplotlib~=3.8",
   "numpy~=2.0",
   "plotly~=6.5",
   "scipy~=1.14",

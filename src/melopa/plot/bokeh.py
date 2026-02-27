@@ -11,8 +11,13 @@ from bokeh.palettes import Category10
 from melopa import math
 
 
-def frequency(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
-    """Plot audio frequency spectrums with Bokeh."""
+def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
+    """Plot audio frequency time heatmap with Bokeh."""
+    raise NotImplementedError
+
+
+def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
+    """Plot audio frequency spectrum with Bokeh."""
     palette = itertools.cycle(Category10[10])
     plots = []
 
