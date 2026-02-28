@@ -30,7 +30,7 @@ dependencies = [
   "scipy~=1.14",
   "soundfile~=0.13.0",
 ]
-description = "Personal collection of notes, tutorials and workbooks."
+description = "Interactive Python audio notebooks."
 keywords = []
 name = "melopa"
 readme = "README.md"

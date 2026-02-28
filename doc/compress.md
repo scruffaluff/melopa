@@ -29,7 +29,6 @@ import marimo as mo
 import numpy
 from numpy.typing import NDArray
 import melopa
-import melopa.plot
 ```
 
 Dynamic range compressors decrease an audio signal's dynamic range by
@@ -78,7 +77,7 @@ code
 ```
 
 ```python {.marimo}
-state, audio = melopa.audio_selector("templeofhades-scratch_sample.wav")
+state, audio = melopa.source.component("templeofhades-scratch_sample.wav")
 ratio = mo.ui.slider(0, 100, 0.1, label="Ratio", show_value=True, value=4.0)
 threshold = mo.ui.slider(0, 1, 0.01, label="Threshold", show_value=True, value=0.8)
 
@@ -98,7 +97,7 @@ exec(f"{code.value}\nprocessed = compress(signal)")
 ```
 
 ```python {.marimo}
-visual = melopa.plot.select()
+visual = melopa.plot.component()
 mo.right(visual)
 ```
 

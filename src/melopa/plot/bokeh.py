@@ -9,6 +9,7 @@ from bokeh.models import FixedTicker, Pane, Range1d
 from bokeh.palettes import Category10
 
 from melopa import math
+from melopa.plot import util
 
 
 def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
@@ -20,13 +21,13 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     """Plot audio frequency spectrum with Bokeh."""
     palette = itertools.cycle(Category10[10])
     plots = []
+    ticks = util.spectrum_ticks()
 
     for signal in signals:
         rate = signal.pop("rate")
-        sample = signal.pop("y")
-        x = numpy.fft.rfftfreq(len(sample), 1 / rate)
-        y_ = numpy.fft.rfft(sample)
-        y = math.loudness(y_ / numpy.abs(y_).max())
+        wave = signal.pop("y")
+        x = numpy.fft.rfftfreq(len(wave), 1 / rate)
+        y = math.decibel(numpy.fft.rfft(wave))
         color = signal.pop("color", next(palette))
 
         if kwargs.pop("smooth", False):
@@ -40,14 +41,11 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                     sizing_mode="stretch_width",
                     x_axis_label="Frequency (Hz)",
                     x_axis_type="log",
-                    x_range=Range1d(1, 20_000),
-                    y_axis_label="Loudness (dB)",
-                    y_range=Range1d(-100, 0),
+                    x_range=Range1d(20, 20_000),
+                    y_axis_label="Amplitude (dB)",
                     **kwargs,
                 )
-                plot.xaxis.ticker = FixedTicker(
-                    ticks=[1, 50, 100, 500, 1_000, 5_000, 10_000, 15_000, 20_000]
-                )
+                plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
                 plots.append(plot)
         else:
             plot = plotting.figure(
@@ -55,14 +53,11 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                 sizing_mode="stretch_width",
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
-                x_range=Range1d(1, 20_000),
-                y_axis_label="Loudness (dB)",
-                y_range=Range1d(-100, 0),
+                x_range=Range1d(20, 20_000),
+                y_axis_label="Amplitude (dB)",
                 **kwargs,
             )
-            plot.xaxis.ticker = FixedTicker(
-                ticks=[1, 50, 100, 500, 1_000, 5_000, 10_000, 15_000, 20_000]
-            )
+            plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
             plots.append(plot)
 
         plot.line(

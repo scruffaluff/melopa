@@ -1,6 +1,6 @@
 {
   "background_color": "#ffffff",
-  "description": "Personal collection of notes, tutorials and workbooks",
+  "description": "Collection of interactive Python audio notebooks",
   "display": "standalone",
   "icons": [
     {

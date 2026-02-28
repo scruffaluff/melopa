@@ -1,6 +1,4 @@
 # Melopa
 
-**TEST REPOSITORY. DO NOT USE YET.**
-
-Melopa is my personal collection of notebooks hosted at
+Melopa is my collection of interactive Python audio notebooks hosted at
 https://scruffaluff.github.io/melopa.

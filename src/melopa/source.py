@@ -9,7 +9,8 @@ from urllib import request
 
 import marimo
 import numpy
-from marimo import ui
+from marimo import Html, ui
+from marimo._runtime.state import State
 from numpy.typing import NDArray
 from scipy.io import wavfile
 
@@ -150,6 +151,36 @@ class SourceSine(Source):
         """Load audio signal."""
         time = numpy.linspace(0, 2, int(self._time * self._rate))
         return numpy.sin(2 * numpy.pi * self._freq * time), self._rate
+
+
+def component(default: str) -> tuple[State[Source], Html]:
+    """Marimo input element to select an audio signal."""
+    get_file, set_file = marimo.state(select(default))
+    file = marimo.ui.dropdown(
+        SourceFile.list(),
+        allow_select_none=True,
+        label="Select File",
+        on_change=lambda name: set_file(SourceFile(name)),
+        value=None,
+    )
+    synth = marimo.ui.dropdown(
+        synths(),
+        allow_select_none=True,
+        label="Synth Generator",
+        on_change=lambda name: set_file(select(name)),
+        value=None,
+    )
+    upload = marimo.ui.file(
+        filetypes=[".wav"],
+        kind="button",
+        label="Upload File",
+        on_change=lambda input_: set_file(SourceInput(input_)),
+    )
+    return get_file, marimo.md("{file} {synth} {upload}").batch(
+        file=file,  # ty:ignore[invalid-argument-type]
+        synth=synth,  # ty:ignore[invalid-argument-type]
+        upload=upload,  # ty:ignore[invalid-argument-type]
+    )
 
 
 def select(name: str) -> Source:

@@ -4,7 +4,7 @@ import numpy
 from numpy.typing import NDArray
 
 
-def loudness(signal: NDArray) -> NDArray:
+def decibel(signal: NDArray) -> NDArray:
     """Convert signal to decibels."""
     return 20 * numpy.log10(numpy.abs(signal))
 
