@@ -1,7 +1,7 @@
 """Plotting interfaces."""
 
 from enum import StrEnum
-from typing import Any, NamedTuple, cast
+from typing import Any, NamedTuple
 
 import marimo
 from marimo import Html
@@ -15,23 +15,23 @@ class Options(StrEnum):
     @classmethod
     def options(cls) -> list[str]:
         """List all options."""
-        return [kind.value for kind in cls]
+        return [kind.value.capitalize() for kind in cls]
 
 
 class Backend(Options):
     """Plot backends."""
 
-    Bokeh = "Bokeh"
-    Matplotlib = "Matplotlib"
-    Plotly = "Plotly"
+    Bokeh = "bokeh"
+    Matplotlib = "matplotlib"
+    Plotly = "plotly"
 
 
 class Kind(Options):
     """Plot types."""
 
-    Spectrogram = "Spectrogram"
-    Spectrum = "Spectrum"
-    Waveform = "Waveform"
+    Spectrogram = "spectrogram"
+    Spectrum = "spectrum"
+    Waveform = "waveform"
 
 
 class Config(NamedTuple):
@@ -66,27 +66,23 @@ def component() -> marimo.ui.batch:
 
 def signal(
     signals: list[dict],
-    config: marimo.ui.batch | None = None,
+    backend: str = "bokeh",
+    kind: str = "waveform",
+    overlay: bool = True,
     **kwargs: Any,
 ) -> Html:
     """Plot audio signals."""
-    if config is None:
-        config_ = Config()
-    elif isinstance(config, Config):
-        config_ = config
-    else:
-        config_ = Config(**cast("dict", config.value))
-    module = {"Bokeh": bokeh, "Matplotlib": matplotlib, "Plotly": plotly}[
-        config_.backend
+    module = {"bokeh": bokeh, "matplotlib": matplotlib, "plotly": plotly}[
+        backend.lower()
     ]
 
-    match config_.kind:
-        case Kind.Spectrogram:
-            return module.spectrogram(signals, config_.overlay, **kwargs)
-        case Kind.Spectrum:
-            return module.spectrum(signals, config_.overlay, **kwargs)
-        case Kind.Waveform:
-            return module.waveform(signals, config_.overlay, **kwargs)
+    match kind.lower():
+        case "spectrogram":
+            return module.spectrogram(signals, overlay, **kwargs)
+        case "spectrum":
+            return module.spectrum(signals, overlay, **kwargs)
+        case "waveform":
+            return module.waveform(signals, overlay, **kwargs)
         case _:
-            message = f"Invalid choice '{config.kind_}' for PlotKind."
+            message = f"Invalid choice '{kind}' for PlotKind."
             raise ValueError(message)

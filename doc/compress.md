@@ -106,8 +106,8 @@ plot = melopa.plot.signal([
     {"rate": rate, "y": signal, "legend_label": "original"},
     {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
-    config=visual,
     title=source.name(),
+    **visual.value,
 )
 plot
 ```

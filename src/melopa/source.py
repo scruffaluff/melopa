@@ -176,7 +176,7 @@ def component(default: str) -> tuple[State[Source], Html]:
         label="Upload File",
         on_change=lambda input_: set_file(SourceInput(input_)),
     )
-    return get_file, marimo.md("{file} {synth} {upload}").batch(
+    return get_file, Html("<div>{file}{synth}{upload}</div>").batch(
         file=file,  # ty:ignore[invalid-argument-type]
         synth=synth,  # ty:ignore[invalid-argument-type]
         upload=upload,  # ty:ignore[invalid-argument-type]

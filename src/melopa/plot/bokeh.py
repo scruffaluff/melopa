@@ -1,14 +1,11 @@
 """Plotting routines with Bokeh."""
 
-import itertools
 from typing import Any
 
 import numpy
 from bokeh import layouts, plotting
 from bokeh.models import FixedTicker, Pane, Range1d
-from bokeh.palettes import Category10
 
-from melopa import math
 from melopa.plot import util
 
 
@@ -19,15 +16,12 @@ def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pan
 
 def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     """Plot audio frequency spectrum with Bokeh."""
-    palette = itertools.cycle(Category10[10])
+    palette = util.palette_cycle()
     plots = []
     ticks = util.spectrum_ticks()
 
     for signal in signals:
-        rate = signal.pop("rate")
-        wave = signal.pop("y")
-        x = numpy.fft.rfftfreq(len(wave), 1 / rate)
-        y = math.decibel(numpy.fft.rfft(wave))
+        x, y = util.signal_spectrum(signal)
         color = signal.pop("color", next(palette))
 
         if kwargs.pop("smooth", False):
@@ -67,21 +61,21 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             line_width=2,
             **signal,
         )
-        plot.legend.click_policy = "mute"
+        if overlay and len(signals) > 1:
+            plot.legend.click_policy = "mute"
         plot.toolbar.logo = None
     return layouts.row(plots, sizing_mode="stretch_width")
 
 
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     """Plot audio waveform with Bokeh."""
-    palette = itertools.cycle(Category10[10])
-    x_range = Range1d(0, max(len(signal["y"]) / signal["rate"] for signal in signals))
+    palette = util.palette_cycle()
+    x_range = Range1d(0, 0)
     plots = []
 
     for signal in signals:
-        rate = signal.pop("rate")
-        y = signal.pop("y")
-        x = numpy.linspace(0, len(y) / rate, len(y))
+        x, y = util.signal_waveform(signal)
+        x_range.end = max(x[-1], x_range.end)
         color = signal.pop("color", next(palette))
 
         if overlay:
@@ -107,7 +101,6 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                     sizing_mode="stretch_width",
                     x_axis_label="Time (s)",
                     x_range=plots[0].x_range,
-                    y_axis_label="Amplitude",
                     y_range=plots[0].y_range,
                     tools="pan,box_zoom,wheel_zoom,save,reset,undo,redo",
                     **kwargs,
@@ -131,6 +124,7 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             line_width=2,
             **signal,
         )
-        plot.legend.click_policy = "mute"
+        if overlay and len(signals) > 1:
+            plot.legend.click_policy = "mute"
         plot.toolbar.logo = None
     return layouts.row(plots, sizing_mode="stretch_width")
