@@ -34,15 +34,32 @@ import melopa
 
 Audio filters remove aspects of a sound such as frequencies.
 
+A discrete time system is defined as $y[n] = T\{x[n]\}$ and is represented by
+the flow chart below.
+
+```python {.marimo}
+mo.mermaid("""
+stateDiagram
+    direction LR
+    x[n] --> y[n]: T{*}
+""")
+```
+
+```python {.marimo}
+cutoff = mo.ui.slider(steps=(440 * numpy.logspace(-4, 5, 100, base=2)).round(2), label="Cutoff", show_value=True)
+order = mo.ui.slider(1, 10, 1, label="Order", show_value=True, value=4)
+mo.hstack([cutoff, order], justify="start")
+```
+
 ```python {.marimo}
 rate = 40_000
-b, a = scipy.signal.butter(4, 480, "lowpass", fs=rate)
+b, a = scipy.signal.butter(order.value, cutoff.value, "lowpass", fs=rate)
 freq, amp = scipy.signal.freqz(b, a, 1_000, fs=rate)
 decibels = melopa.math.decibel(amp)
 ```
 
 ```python {.marimo}
-melopa.plot.signal([{"x": freq, "f": decibels}], kind="spectrum")
+melopa.plot.signal([{"x": freq, "f": decibels}], backend="matplotlib", kind="spectrum", y_range=(-100, 0))
 ```
 
 ```python {.marimo}

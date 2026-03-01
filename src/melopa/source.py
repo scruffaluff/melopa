@@ -14,7 +14,7 @@ from marimo._runtime.state import State
 from numpy.typing import NDArray
 from scipy.io import wavfile
 
-from melopa import math
+from melopa import math, util
 
 
 class Source(ABC):
@@ -70,7 +70,7 @@ class SourceFile(Source):
             content = BytesIO(request.urlopen(url).read())  # noqa: S310
             rate, signal = wavfile.read(content)
         else:
-            path = folder.parent / f"data/audio/{self._file}"
+            path = util.repo_path() / f"data/audio/{self._file}"
             rate, signal = wavfile.read(path)
         if len(signal.shape) > 1:
             signal = numpy.mean(signal, axis=1)
