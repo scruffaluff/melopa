@@ -34,8 +34,8 @@ import melopa
 
 Audio filters remove aspects of a sound such as frequencies.
 
-A discrete time system is defined as $y[n] = T\{x[n]\}$ and is represented by
-the flow chart below.
+A discrete time system is defined as $y[n] = T\{x[n]\}$ as shown in the block
+diagram below.
 
 ```python {.marimo}
 mo.mermaid("""
