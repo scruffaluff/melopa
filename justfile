@@ -57,12 +57,12 @@ dev +paths="doc":
 # Fix code formatting.
 format +paths=".":
   deno run --allow-all npm:prettier --write {{paths}}
-  uv run ruff format {{paths}}
+  uv run ruff format --preview {{paths}}
 
 # Run code analyses.
 lint +paths=".":
   deno run --allow-all npm:prettier --check {{paths}}
-  uv run ruff format --check {{paths}}
+  uv run ruff format --check --preview {{paths}}
   uv run ruff check {{paths}}
   uv run ty check {{paths}}
 

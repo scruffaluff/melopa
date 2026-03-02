@@ -22,8 +22,10 @@ header: |-
 
 ```python {.marimo name="setup"}
 import sys
+
 if sys.platform == "emscripten":
     import micropip
+
     await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 from bokeh import plotting
 import marimo as mo
@@ -34,7 +36,7 @@ import scipy.signal
 import melopa
 ```
 
-The discrete Fourier transform converts a discrete timedomain signal to its
+The discrete Fourier transform converts a discrete time domain signal to its
 frequency domain representation. For a signal $x[n]$ of length $N$ and sampling
 period $T$, the transform is defined below with fundamental angular frequency
 $w = \frac{2\pi}{NT}$.
@@ -55,18 +57,18 @@ at 50Hz as plotted below.
 freq = 2
 rate = 50
 t = numpy.linspace(0, 1, rate)
-x = numpy.sin(2*numpy.pi*freq*rate*t)
+x = numpy.sin(2 * numpy.pi * freq * rate * t)
 ```
 
 ```python {.marimo}
 def dft(x: NDArray) -> NDArray:
     """Calculate the discrete Fourier transform of an array."""
     N = len(x)
-    w = 2*numpy.pi / N
+    w = 2 * numpy.pi / N
     size = math.floor(N / 2 + 1)
     X = numpy.zeros(size, dtype=numpy.complex128)
     for k in range(size):
-        X[k] = numpy.sum(x * numpy.exp(-1j*w*k*numpy.arange(N)))
+        X[k] = numpy.sum(x * numpy.exp(-1j * w * k * numpy.arange(N)))
     return X
 ```
 

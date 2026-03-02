@@ -22,8 +22,10 @@ header: |-
 
 ```python {.marimo name="setup"}
 import sys
+
 if sys.platform == "emscripten":
     import micropip
+
     await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
 import melopa

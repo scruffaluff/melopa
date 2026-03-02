@@ -22,8 +22,10 @@ header: |-
 
 ```python {.marimo name="setup"}
 import sys
+
 if sys.platform == "emscripten":
     import micropip
+
     await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
 import numpy
@@ -46,7 +48,11 @@ stateDiagram
 ```
 
 ```python {.marimo}
-cutoff = mo.ui.slider(steps=(440 * numpy.logspace(-4, 5, 100, base=2)).round(2), label="Cutoff", show_value=True)
+cutoff = mo.ui.slider(
+    steps=(440 * numpy.logspace(-4, 5, 100, base=2)).round(2),
+    label="Cutoff",
+    show_value=True,
+)
 order = mo.ui.slider(1, 10, 1, label="Order", show_value=True, value=4)
 mo.hstack([cutoff, order], justify="start")
 ```
@@ -59,7 +65,12 @@ decibels = melopa.math.decibel(amp)
 ```
 
 ```python {.marimo}
-melopa.plot.signal([{"x": freq, "f": decibels}], backend="matplotlib", kind="spectrum", y_range=(-100, 0))
+melopa.plot.signal(
+    [{"x": freq, "f": decibels}],
+    backend="matplotlib",
+    kind="spectrum",
+    y_range=(-100, 0),
+)
 ```
 
 ```python {.marimo}

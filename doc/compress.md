@@ -22,8 +22,10 @@ header: |-
 
 ```python {.marimo name="setup"}
 import sys
+
 if sys.platform == "emscripten":
     import micropip
+
     await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
 import numpy
@@ -86,7 +88,7 @@ mo.ui.tabs(
         "File": audio,
         "Parameter": mo.hstack([ratio, threshold], gap=2, justify="start"),
     },
-    label="Controls"
+    label="Controls",
 )
 ```
 
@@ -102,9 +104,10 @@ mo.right(visual)
 ```
 
 ```python {.marimo}
-plot = melopa.plot.signal([
-    {"rate": rate, "y": signal, "legend_label": "original"},
-    {"rate": rate, "y": processed, "legend_label": "compressed"},
+plot = melopa.plot.signal(
+    [
+        {"rate": rate, "y": signal, "legend_label": "original"},
+        {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
     title=source.name(),
     **visual.value,
@@ -115,5 +118,12 @@ plot
 We can listen to both versions of the signal below.
 
 ```python {.marimo}
-mo.hstack([mo.vstack([mo.md("### Original"), mo.audio(signal, rate)]), mo.vstack([mo.md("### Compressed"), mo.audio(processed, rate)])], gap=2, justify="start")
+mo.hstack(
+    [
+        mo.vstack([mo.md("### Original"), mo.audio(signal, rate)]),
+        mo.vstack([mo.md("### Compressed"), mo.audio(processed, rate)]),
+    ],
+    gap=2,
+    justify="start",
+)
 ```

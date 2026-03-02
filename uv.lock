@@ -738,7 +738,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "coverage", specifier = "~=7.13" },
-    { name = "jinja2-cli", specifier = ">=1.0.0" },
+    { name = "jinja2-cli", specifier = "~=1.0" },
     { name = "pytest", specifier = "~=9.0" },
     { name = "pytest-cov", specifier = "~=7.0" },
     { name = "pytest-mock", specifier = "~=3.15" },
