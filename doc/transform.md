@@ -1,5 +1,5 @@
 ---
-title: Fourier
+title: Transform
 marimo-version: 0.20.2
 width: medium
 header: |-
@@ -94,5 +94,15 @@ plot.line(
 )
 plot
 ```
+
+The z-transform of sequence $x[n]$ is defined as
+
+$$ X(z) = \sum\_{n-\infty}^{\infty} x[n] z^{-n} $$
+
+The discrete Fourier transform is the restriction of the z-transform to the unit
+circle, i.e. where $z = e^{jw}$.
+
+The closed form of the z-transform is blah. The zeros are the roots of the
+numerator and the poles are the roots of the denominator.
 
 <!-- prettier-ignore-end -->

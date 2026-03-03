@@ -34,6 +34,7 @@ import numpy
 from numpy.typing import NDArray
 import scipy.signal
 import melopa
+from melopa.source import SourceFile
 ```
 
 Audio filters remove aspects of a sound such as frequencies.
@@ -43,6 +44,11 @@ diagram below.
 
 ```python {.marimo}
 mo.mermaid("""
+---
+config:
+    theme: neutral
+---
+
 stateDiagram
     direction LR
     x[n] --> y[n]: T{*}
@@ -72,6 +78,38 @@ melopa.plot.signal(
     backend="matplotlib",
     kind="spectrum",
     y_range=(-100, 0),
+)
+```
+
+```python {.marimo}
+sample, rate_ = SourceFile("templeofhades-scratch_sample.wav").read()
+sos = scipy.signal.butter(10, 1000, "lowpass", fs=rate, output="sos")
+processed = scipy.signal.sosfilt(sos, sample)
+```
+
+```python {.marimo hide_code="true"}
+visual = melopa.plot.component()
+mo.right(visual)
+```
+
+```python {.marimo}
+melopa.plot.signal(
+    [
+        {"rate": rate_, "y": sample, "legend_label": "original"},
+        {"rate": rate_, "y": processed, "legend_label": "processed"},
+    ],
+    **visual.value,
+)
+```
+
+```python {.marimo}
+mo.hstack(
+    [
+        mo.vstack([mo.md("### Original"), mo.audio(sample, rate)]),
+        mo.vstack([mo.md("### Processed"), mo.audio(processed, rate)]),
+    ],
+    gap=2,
+    justify="start",
 )
 ```
 
