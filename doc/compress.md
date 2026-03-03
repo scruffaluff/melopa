@@ -18,6 +18,8 @@ header: |-
   # ///
 ---
 
+<!-- prettier-ignore-start -->
+
 # Compression
 
 ```python {.marimo name="setup"}
@@ -127,3 +129,5 @@ mo.hstack(
     justify="start",
 )
 ```
+
+<!-- prettier-ignore-end -->

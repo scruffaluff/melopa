@@ -18,6 +18,8 @@ header: |-
   # ///
 ---
 
+<!-- prettier-ignore-start -->
+
 # Fourier
 
 ```python {.marimo name="setup"}
@@ -41,13 +43,11 @@ frequency domain representation. For a signal $x[n]$ of length $N$ and sampling
 period $T$, the transform is defined below with fundamental angular frequency
 $w = \frac{2\pi}{NT}$.
 
-<!-- prettier-ignore -->
 $$ X[k] = \sum_{n=0}^{N-1} x[n] e^{-iwkn} $$
 
 The sampling period $T$ of a signal is related to its sampling frequency by
 $F = \frac{1}{T}$. The inverse transform is defined below.
 
-<!-- prettier-ignore -->
 $$ x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] e^{iwkn} $$
 
 To demonstrate this, we'll analyze a discrete sine wave of frequency 2Hz sampled
@@ -94,3 +94,5 @@ plot.line(
 )
 plot
 ```
+
+<!-- prettier-ignore-end -->

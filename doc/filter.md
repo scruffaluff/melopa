@@ -18,6 +18,8 @@ header: |-
   # ///
 ---
 
+<!-- prettier-ignore-start -->
+
 # Filters
 
 ```python {.marimo name="setup"}
@@ -73,6 +75,4 @@ melopa.plot.signal(
 )
 ```
 
-```python {.marimo}
-
-```
+<!-- prettier-ignore-end -->
