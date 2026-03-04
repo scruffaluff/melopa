@@ -17,10 +17,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure
     """Plot audio frequency spectrum with Matplotlib."""
     palette = util.palette_cycle()
     legend = False
-    figure, axes = pyplot.subplots(
-        figsize=(12, 6), ncols=1 if overlay else len(signals)
-    )
-    figure.tight_layout()
+    figure, axes = subplots(ncols=1 if overlay else len(signals))
     ticks = util.spectrum_ticks()
     x_range = kwargs.pop("x_range", (20, 20_000))
     y_range = kwargs.pop("y_range", None)
@@ -47,14 +44,18 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure
     return figure
 
 
+def subplots(*args: Any, **kwargs: Any) -> tuple[Figure, Any]:
+    """Melopa wrapper for Matplotlib subplots."""
+    figure_, axes = pyplot.subplots(*args, figsize=(12, 6), **kwargs)
+    figure_.tight_layout()
+    return figure_, axes
+
+
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     """Plot audio waveform with Matplotlib."""
     palette = util.palette_cycle()
     legend = False
-    figure, axes = pyplot.subplots(
-        figsize=(12, 6), ncols=1 if overlay else len(signals)
-    )
-    figure.tight_layout()
+    figure, axes = subplots(ncols=1 if overlay else len(signals))
 
     for index, signal in enumerate(signals):
         label = signal.pop("legend_label", None)

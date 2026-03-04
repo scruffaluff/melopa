@@ -1,7 +1,4 @@
 ---
-title: Scratchpad
-marimo-version: 0.20.2
-width: medium
 header: |-
   # /// script
   # dependencies = [
@@ -18,6 +15,9 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
+title: Scratchpad
+marimo-version: 0.20.2
+width: medium
 ---
 
 ```python {.marimo name="setup"}

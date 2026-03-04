@@ -7,6 +7,9 @@ import marimo
 from marimo import Html
 
 from melopa.plot import bokeh, matplotlib, plotly
+from melopa.plot.bokeh import figure
+
+__all__ = ["bokeh", "figure", "matplotlib", "plotly"]
 
 
 class Options(StrEnum):

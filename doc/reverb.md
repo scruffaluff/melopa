@@ -5,13 +5,29 @@ width: medium
 ---
 
 <!-- prettier-ignore-start -->
+<!-- Check if the lack of dependency specification in the header causes slower
+WASM loads. -->
 
-# Reverberation
+# Reverb
 
 ```python {.marimo name="setup"}
+import sys
+
+if sys.platform == "emscripten":
+    import micropip
+
+    await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
 import melopa
 ```
+
+Acoustic reverb is the persistence of sound through reflections from surfaces.
+
+## Moorer Algorithm
+
+We start our reverb analysis by implementing the algorithm from James Moorer in
+his _About This Reverberation Business_ article. The algorithm logic is
+encapsulated in the block diagram below.
 
 ```python {.marimo}
 mo.mermaid("""
