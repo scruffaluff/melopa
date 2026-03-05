@@ -14,6 +14,7 @@ dev = [
   "pytest~=9.0",
   "pytest-cov~=7.0",
   "pytest-mock~=3.15",
+  "python-lsp-server~=1.14",
   "pyzmq~=27.1",
   "ruff~=0.15.1",
   "ty~=0.0.16",
@@ -23,7 +24,7 @@ dev = [
 # Dependency constraints must be flexible for WASM compatibility with Micropip.
 dependencies = [
   "bokeh~=3.6",
-  "marimo~=0.20.2",
+  "marimo~=0.20.4",
   "matplotlib~=3.8",
   "numpy~=2.0",
   "plotly~=6.5",

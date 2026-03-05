@@ -13,7 +13,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.20.2
+marimo-version: 0.20.4
 title: Filters
 width: medium
 ---
