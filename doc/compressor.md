@@ -14,13 +14,13 @@ header: |-
   # melopa = { editable = true, path = "src/melopa" }
   # ///
 marimo-version: 0.20.4
-title: Compression
+title: Compressors
 width: medium
 ---
 
 <!-- prettier-ignore-start -->
 
-# Compression
+# Compressors
 
 ```python {.marimo name="setup"}
 import sys
@@ -35,23 +35,22 @@ from numpy.typing import NDArray
 import melopa
 ```
 
-Dynamic range compressors decrease the dynamic range of audio by attenuating
-loud sounds and amplifying quiet sounds.
-
-## Downward Compressors
-
-A downward peak compressor only attenuates loud sounds above a specific amplitude. It
-is controlled by the following parameters which attached to their variable
-names.
+Dynamic range compressors decrease the amplitude variation in audio by
+attenuating loud sounds and amplifying quiet sounds. A downward peak compressor
+only attenuates loud sounds above a specific amplitude. It is controlled by the
+following parameters which attached to their variable names.
 
 - _Threshold (T)_ controls the minimum amplitude for compression to be applied.
-- _Ratio (R)_ controls the amount of compression to be applied.
+  Any sample above the threshold is attenuated.
+- _Ratio (R)_ controls the amount of compression to be applied for samples above
+  the threshold.
 - _Attack_ controls how quickly compression is applied after going above the
   threshold.
 - _Release_ controls how quickly compression is stopped after going below the
   threshold.
-- _Knee (K)_ smooths the compression threshold by
-- _Gain (G)_ applies additional volume to the signal after compression.
+- _Knee (K)_ softens the threshold transition by rounding its angle.
+- _Gain (G)_ applies additional volume to the signal after compression and
+  compensates for the reduction in signal amplitude.
 
 The compression algorithm without the _attack_ or _release_ parameters is
 described by the following formula[[1]](#1).
@@ -78,22 +77,17 @@ def compress(
     sign = numpy.sign(signal)
     amplitude = numpy.abs(signal)
 
-    for index in range(len(signal)):
+    for index in range(len(amplitude)):
         value = amplitude[index] - threshold
         if value > knee / 2:
-            amplitude[index] = value / ratio + threshold
+            amplitude[index] = threshold + value / ratio
         elif value > -knee / 2:
             smoothing = (value + knee / 2) ** 2 / (2 * knee * ratio)
             amplitude[index] += (1 - ratio) * smoothing
 
     return gain * sign * amplitude
 """.strip()
-code_ui = mo.ui.code_editor(value=code)
-code_ui
-```
-
-```python {.marimo}
-
+editor = melopa.ui.editor(code)
 ```
 
 ```python {.marimo}
@@ -105,7 +99,7 @@ knee_ui = mo.ui.slider(
     0, 1, 0.01, debounce=True, label="Knee", show_value=True, value=0.0
 )
 ratio_ui = mo.ui.slider(
-    0, 100, 0.1, debounce=True, label="Ratio", show_value=True, value=4.0
+    1, 100, 0.1, debounce=True, label="Ratio", show_value=True, value=4.0
 )
 threshold_ui = mo.ui.slider(
     0, 1, 0.01, debounce=True, label="Threshold", show_value=True, value=0.8
@@ -113,10 +107,11 @@ threshold_ui = mo.ui.slider(
 
 mo.ui.tabs(
     {
-        "File": audio,
+        "Code": editor,
         "Parameter": mo.hstack(
             [gain_ui, knee_ui, ratio_ui, threshold_ui], gap=2, justify="start"
         ),
+        "Signal": audio,
     },
     label="Controls",
 )
@@ -125,9 +120,13 @@ mo.ui.tabs(
 ```python {.marimo}
 source = state()
 signal, rate = source.read()
-exec(
-    f"{code_ui.value}\nprocessed = compress(signal, {gain_ui.value}, {knee_ui.value}, {ratio_ui.value}, {threshold_ui.value})"
+exec(editor.value["editor"])
+processed, output = melopa.ui.run(
+    lambda: compress(
+        signal, gain_ui.value, knee_ui.value, ratio_ui.value, threshold_ui.value
+    )
 )
+output
 ```
 
 ```python {.marimo}
@@ -163,6 +162,8 @@ mo.hstack(
 ## References
 
 <a id="1">[1]</a>
+Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua. (2012). [Digital Dynamic Range Compressor Design—A Tutorial and Analysis](https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysis). AES: Journal of the Audio Engineering Society. 60.
+<a id="2">[2]</a>
 McCormack, Leo and Valimaki, Vesa and others. [FFT-based dynamic range compression](https://leomccormack.github.io/sparta-site/docs/help/related-publications/mccormack2017fft.pdf). 2017.
 
 <!-- prettier-ignore-end -->
