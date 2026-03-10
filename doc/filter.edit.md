@@ -14,25 +14,26 @@ header: |-
   # melopa = { editable = true, path = "src/melopa" }
   # ///
 marimo-version: 0.20.4
-title: Filters
+title: Filter
 width: medium
 ---
 
 <!-- prettier-ignore-start -->
 
-# Filters
+# Filter
 
 ```python {.marimo name="setup"}
 import sys
 
-if sys.platform == "emscripten":
-    import micropip
+await __import__("micropip").install(
+    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+) if sys.platform == "emscripten" else None
 
-    await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
 import numpy
 from numpy.typing import NDArray
 import scipy.signal
+
 import melopa
 from melopa.source import SourceFile
 ```
@@ -88,7 +89,7 @@ processed = scipy.signal.sosfilt(sos, sample)
 ```
 
 ```python {.marimo hide_code="true"}
-visual = melopa.plot.component()
+visual = melopa.plot.ui()
 mo.right(visual)
 ```
 

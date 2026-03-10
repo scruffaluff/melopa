@@ -1,4 +1,4 @@
-"""Custom Marimo editor component."""
+"""Custom Marimo UI components."""
 
 import traceback
 from collections.abc import Callable

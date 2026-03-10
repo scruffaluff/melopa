@@ -1,6 +1,6 @@
 ---
 marimo-version: 0.20.4
-title: Reverberation
+title: Reverb
 width: medium
 ---
 
@@ -13,11 +13,12 @@ WASM loads. -->
 ```python {.marimo name="setup"}
 import sys
 
-if sys.platform == "emscripten":
-    import micropip
+await __import__("micropip").install(
+    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+) if sys.platform == "emscripten" else None
 
-    await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
+
 import melopa
 ```
 

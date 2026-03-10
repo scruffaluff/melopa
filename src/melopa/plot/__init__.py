@@ -45,7 +45,7 @@ class Config(NamedTuple):
     overlay: bool = True
 
 
-def component() -> marimo.ui.batch:
+def ui() -> marimo.ui.batch:
     """Marimo element to select a signal plot settings."""
     backend = marimo.ui.dropdown(
         Backend.options(),

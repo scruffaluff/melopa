@@ -20,11 +20,14 @@
       {% if notebooks %}
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {% for notebook in notebooks %}
-        <!-- {{ notebook | replace('.md', '')  | replace('_', ' ') | title }} Notebook -->
         <div class="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-          <div class="bg-gray-200 p-3 font-semibold">{{ notebook | replace('.md', '')  | replace('_', ' ') | title }}</div>
+          <div class="bg-gray-200 p-3 font-semibold">
+            {{ notebook | replace('.edit', '') | replace('.md', '')  | replace('_', ' ') | title }}
+          </div>
           <div class="p-4">
-            <a href="/melopa/{{ notebook | replace('.md', '.html') }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded transition-colors">Open Notebook</a>
+            <a href="/melopa/{{ notebook | replace('.edit', '') | replace('.md', '.html') }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded transition-colors">
+              Open Notebook
+            </a>
           </div>
         </div>
         {% endfor %}

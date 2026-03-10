@@ -153,7 +153,7 @@ class SourceSine(Source):
         return numpy.sin(2 * numpy.pi * self._freq * time), self._rate
 
 
-def component(default: str) -> tuple[State[Source], Html]:
+def ui(default: str) -> tuple[State[Source], Html]:
     """Marimo input element to select an audio signal."""
     get_file, set_file = marimo.state(select(default))
     file = marimo.ui.dropdown(

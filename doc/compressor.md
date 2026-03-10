@@ -14,24 +14,25 @@ header: |-
   # melopa = { editable = true, path = "src/melopa" }
   # ///
 marimo-version: 0.20.4
-title: Compressors
+title: Compressor
 width: medium
 ---
 
 <!-- prettier-ignore-start -->
 
-# Compressors
+# Compressor
 
 ```python {.marimo name="setup"}
 import sys
 
-if sys.platform == "emscripten":
-    import micropip
+await __import__("micropip").install(
+    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+) if sys.platform == "emscripten" else None
 
-    await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
 import marimo as mo
 import numpy
 from numpy.typing import NDArray
+
 import melopa
 ```
 
@@ -91,7 +92,7 @@ editor = melopa.ui.editor(code)
 ```
 
 ```python {.marimo}
-state, audio = melopa.source.component("templeofhades-scratch_sample.wav")
+state, audio = melopa.source.ui("templeofhades-scratch_sample.wav")
 gain_ui = mo.ui.slider(
     1, 10, 0.01, debounce=True, label="Gain", show_value=True, value=1.0
 )
@@ -130,7 +131,7 @@ output
 ```
 
 ```python {.marimo}
-visual = melopa.plot.component()
+visual = melopa.plot.ui()
 mo.right(visual)
 ```
 

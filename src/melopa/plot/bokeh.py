@@ -34,8 +34,9 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     ticks = util.spectrum_ticks()
 
     for signal in signals:
-        x, y = util.signal_spectrum(signal)
         color = signal.pop("color", next(palette))
+        method = signal.pop("method", "line")
+        x, y = util.signal_spectrum(signal)
 
         if plots:
             if overlay:
@@ -63,7 +64,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
             plots.append(plot)
 
-        plot.line(
+        getattr(plot, method)(
             x=x,
             y=y,
             color=color,
@@ -80,9 +81,10 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     plots = []
 
     for signal in signals:
+        color = signal.pop("color", next(palette))
+        method = signal.pop("method", "line")
         x, y = util.signal_waveform(signal)
         x_range.end = max(x[-1], x_range.end)
-        color = signal.pop("color", next(palette))
 
         if plots:
             if overlay:
@@ -106,7 +108,7 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             )
             plots.append(plot)
 
-        plot.line(
+        getattr(plot, method)(
             x=x,
             y=y,
             color=color,

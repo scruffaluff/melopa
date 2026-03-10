@@ -23,10 +23,10 @@ width: medium
 ```python {.marimo name="setup"}
 import sys
 
-if sys.platform == "emscripten":
-    import micropip
-
-    await micropip.install("/melopa/data/melopa-0.1.0-py3-none-any.whl")
+await __import__("micropip").install(
+    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+) if sys.platform == "emscripten" else None
 import marimo as mo
+
 import melopa
 ```

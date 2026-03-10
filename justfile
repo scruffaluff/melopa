@@ -15,7 +15,7 @@ export PATH := if os() == "windows" {
 build:
   let notebooks = ls doc/*.md | get name | path relative-to doc
   let temp = mktemp --dry --tmpdir --suffix .json
-  {"apps": [], "notebooks": $notebooks} | save $temp
+  {"notebooks": $notebooks} | save $temp
   mkdir build/site/data
   uv build --out-dir build/dist
   (
@@ -31,11 +31,11 @@ build:
     build/site/data/
   )
   for notebook in $notebooks {
-    let subpath = $notebook | path parse
-    | if ($in.parent | is-empty) { $in.stem } else { $"($in.parent)/($in.stem)" }
+    let mode = if ($notebook | find --regex '\.edit\.md$' | is-empty) { "run" } else { "edit" }
+    let subpath = $notebook | path basename | str replace --regex '(\.edit)?\.md$' ""
     let html = $"build/site/($subpath).html"
     (
-      uv run marimo --yes export html-wasm --mode edit --output $html
+      uv run marimo --yes export html-wasm --mode $mode --output $html
       $"doc/($notebook)"
     )
     minhtml  --minify-css --minify-js --output $html $html
@@ -107,6 +107,23 @@ setup: _setup
     }
   }
   print $"Using (minhtml --version)."
+  if (which miniserve | is-empty) {
+    let version = http get https://formulae.brew.sh/api/formula/miniserve.json
+    | get versions.stable
+    let target = match $nu.os-info.name {
+      "macos" => $"($nu.os-info.arch)-apple-darwin"
+      "linux" => $"($nu.os-info.arch)-unknown-linux-musl"
+      "windows" => $"($nu.os-info.arch)-pc-windows-msvc.exe"
+    }
+    print "Installing Miniserve."
+    mkdir .vendor/bin
+    http get $"https://github.com/svenstaro/miniserve/releases/download/v($version)/miniserve-($version)-($target)"
+    | save --force $".vendor/bin/miniserve($ext)"
+    if $nu.os-info.name != "windows" {
+      chmod 755 .vendor/bin/miniserve
+    }
+  }
+  print $"Using (miniserve --version)."
   if (which uv | is-empty) {
     print "Installing Uv."
     http get https://scruffaluff.github.io/picoware/install/uv.nu
