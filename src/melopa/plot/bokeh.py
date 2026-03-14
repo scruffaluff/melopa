@@ -47,7 +47,6 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                     x_axis_type="log",
                     x_range=Range1d(20, 20_000),
                     y_axis_label="Amplitude (dB)",
-                    y_range=Range1d(-1, 1),
                     **kwargs,
                 )
                 plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
@@ -58,7 +57,6 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                 x_axis_type="log",
                 x_range=Range1d(20, 20_000),
                 y_axis_label="Amplitude (dB)",
-                y_range=Range1d(-1, 1),
                 **kwargs,
             )
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])

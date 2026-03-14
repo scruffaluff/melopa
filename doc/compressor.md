@@ -105,6 +105,7 @@ ratio_ui = mo.ui.slider(
 threshold_ui = mo.ui.slider(
     0, 1, 0.01, debounce=True, label="Threshold", show_value=True, value=0.8
 )
+plot_ui = melopa.plot.ui()
 
 mo.ui.tabs(
     {
@@ -113,6 +114,7 @@ mo.ui.tabs(
             [gain_ui, knee_ui, ratio_ui, threshold_ui], gap=2, justify="start"
         ),
         "Signal": audio,
+        "Plot": plot_ui,
     },
     label="Controls",
 )
@@ -130,21 +132,15 @@ processed, output = melopa.ui.run(
 output
 ```
 
-```python {.marimo}
-visual = melopa.plot.ui()
-mo.right(visual)
-```
-
-```python {.marimo}
-plot = melopa.plot.signal(
+```python {.marimo unparsable="true"}
+melopa.plot.signal(
     [
         {"rate": rate, "y": signal, "legend_label": "original"},
         {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
     title=source.name(),
-    **visual.value,
+    **plot_ui.value,
 )
-plot
 ```
 
 We can listen to both versions of the signal below.
@@ -164,6 +160,7 @@ mo.hstack(
 
 <a id="1">[1]</a>
 Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua. (2012). [Digital Dynamic Range Compressor Design—A Tutorial and Analysis](https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysis). AES: Journal of the Audio Engineering Society. 60.
+
 <a id="2">[2]</a>
 McCormack, Leo and Valimaki, Vesa and others. [FFT-based dynamic range compression](https://leomccormack.github.io/sparta-site/docs/help/related-publications/mccormack2017fft.pdf). 2017.
 

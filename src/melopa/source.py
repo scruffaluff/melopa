@@ -96,17 +96,17 @@ class SourceInput(Source):
         return math.normalize(signal), rate
 
 
-class SourceDelta(Source):
-    """Generate Kronecker delta signal."""
+class SourceImpulse(Source):
+    """Generate impulse signal."""
 
     def __init__(self, rate: int = 48_000, time: float = 2.0) -> None:
-        """Create a SourceDelta instance."""
+        """Create a SourceImpulse instance."""
         self._rate = rate
         self._time = time
 
     def name(self) -> str:
         """Find name."""
-        return "delta"
+        return "impulse"
 
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""
@@ -132,11 +132,49 @@ class SourceLinear(Source):
         return numpy.linspace(-1, 1, int(self._time * self._rate)), self._rate
 
 
+class SourceNone(Source):
+    """Generate silent signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 2.0) -> None:
+        """Create a SourceNone instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "none"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        return numpy.zeros(int(self._time * self._rate)), self._rate
+
+
+class SourceSawtooth(Source):
+    """Generate sawtooth signal."""
+
+    def __init__(
+        self, freq: float = 8.0, rate: int = 48_000, time: float = 1.0
+    ) -> None:
+        """Create a SourceSawtooth instance."""
+        self._freq = freq
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "sawtooth"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        wave = numpy.linspace(-1, 1, int(self._rate / self._freq))
+        return numpy.concatenate(int(self._freq * self._time) * (wave,)), self._rate
+
+
 class SourceSine(Source):
     """Generate sine signal."""
 
     def __init__(
-        self, freq: float = 8.0, rate: int = 48_000, time: float = 2.0
+        self, freq: float = 8.0, rate: int = 48_000, time: float = 1.0
     ) -> None:
         """Create a SourceSine instance."""
         self._freq = freq
@@ -149,8 +187,31 @@ class SourceSine(Source):
 
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""
-        time = numpy.linspace(0, 2, int(self._time * self._rate))
+        time = numpy.linspace(0, self._time, int(self._time * self._rate))
         return numpy.sin(2 * numpy.pi * self._freq * time), self._rate
+
+
+class SourceSquare(Source):
+    """Generate square signal."""
+
+    def __init__(
+        self, freq: float = 8.0, rate: int = 48_000, time: float = 1.0
+    ) -> None:
+        """Create a SourceSquare instance."""
+        self._freq = freq
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "square"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        period = int(self._rate / self._freq)
+        wave = numpy.ones(period)
+        wave[period // 2 :] = -1.0
+        return numpy.concatenate(int(self._freq * self._time) * (wave,)), self._rate
 
 
 def ui(default: str) -> tuple[State[Source], Html]:
@@ -185,17 +246,19 @@ def ui(default: str) -> tuple[State[Source], Html]:
 
 def select(name: str) -> Source:
     """Find source corresponding to given name."""
-    match name.lower():
-        case "delta":
-            return SourceDelta()
-        case "linear":
-            return SourceLinear()
-        case "sine":
-            return SourceSine()
-        case _:
-            return SourceFile(name)
+    class_ = {
+        "impulse": SourceImpulse,
+        "linear": SourceLinear,
+        "none": SourceNone,
+        "sawtooth": SourceSawtooth,
+        "sine": SourceSine,
+        "square": SourceSquare,
+    }.get(name)
+    if class_ is None:
+        return SourceFile(name)
+    return class_()
 
 
 def synths() -> list[str]:
     """Find list of synth source names."""
-    return ["delta", "linear", "sine"]
+    return ["impulse", "linear", "none", "sawtooth", "sine", "square"]

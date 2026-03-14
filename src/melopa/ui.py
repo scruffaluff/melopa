@@ -15,7 +15,16 @@ def editor(code: str) -> Html:
     button = marimo.ui.button(
         on_click=lambda _: set_code(code), label=f"{marimo.icon('lucide:undo-2')}"
     )
-    return Html("<div>{button}{editor}</div>").batch(
+    return Html(
+        """
+<div>
+  <div style="align-items: end; display: flex; flex-direction: column; margin-bottom: 0.5rem;">
+    {button}
+  </div>
+  {editor}
+</div>
+        """  # noqa: E501
+    ).batch(
         button=button,
         editor=editor_,  # ty:ignore[invalid-argument-type]
     )

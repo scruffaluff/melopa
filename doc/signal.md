@@ -38,27 +38,33 @@ from numpy.typing import NDArray
 import melopa
 ```
 
-A digital audio signal is a representation of sound as a time series sequence of
-numbers denoted as $x[n]$. Digital audio signals can be translated into analog
-signal with an associated sampling frequency $F$. We can view the comparison
-between for analog and digital for the sine and impulse signals below.
+A digital audio signal is a representation of sound as a sequence of numbers
+denoted as $x[n]$. Digital audio signals can be generated from continuous analog
+signals by discretely recording them at a sampling frequency $F$. We can view
+the comparison between for analog and digital for the sine and impulse signals
+below.
 
 ```python {.marimo}
 def _():
     freq = 2
-    rate = 50
-    time = numpy.linspace(0, 1, rate)
-    sine = numpy.sin(2 * numpy.pi * 2 * rate * time)
-    delta = numpy.zeros(len(time))
-    delta[0] = 1
+    time_c = numpy.linspace(0, 1, 256)
+    sine_c = numpy.sin(2 * numpy.pi * 2 * 256 * time_c)
+    delta_c = numpy.zeros(len(time_c))
+    delta_c[0] = 1
+
+    time_d = numpy.linspace(0, 1, 32)
+    sine_d = numpy.sin(2 * numpy.pi * 2 * 32 * time_d)
+    delta_d = numpy.zeros(len(time_d))
+    delta_d[0] = 1
+
     return bokeh.layouts.row(
         [
             melopa.plot.signal(
                 [
-                    {"x": time, "y": sine, "legend_label": "Continuous"},
+                    {"x": time_c, "y": sine_c, "legend_label": "Continuous"},
                     {
-                        "x": time,
-                        "y": sine,
+                        "x": time_d,
+                        "y": sine_d,
                         "legend_label": "Discrete",
                         "method": "scatter",
                     },
@@ -67,10 +73,10 @@ def _():
             ),
             melopa.plot.signal(
                 [
-                    {"x": time, "y": delta, "legend_label": "Continuous"},
+                    {"x": time_c, "y": delta_c, "legend_label": "Continuous"},
                     {
-                        "x": time,
-                        "y": delta,
+                        "x": time_d,
+                        "y": delta_d,
                         "legend_label": "Discrete",
                         "method": "scatter",
                     },
@@ -173,8 +179,9 @@ spectrum_plot.line(x=freq, y=numpy.abs(spectrum))
 bokeh.layouts.row([waveform_plot, spectrum_plot], sizing_mode="stretch_width")
 ```
 
-The Fourier transform has the convolution property that $y[n] = x[n] * h[n]$ if and only if $Y[k] = X[k] H[k]$.
-<!---->
+The Fourier transform has the convolution property that $y[n] = x[n] * h[n]$ if
+and only if $Y[k] = X[k] H[k]$.
+
 ## Z-Transform
 
 The Fourier transform can be extended to the
@@ -189,14 +196,15 @@ X(z) = \sum_{n=-\infty}^{\infty} x[n] z^{-n}
 x[n] = \frac{1}{2\pi j} \oint X(z) z^{n-1} dz
 $$
 
-The Z-transform has the convolution property that $y[n] = x[n] * h[n]$ if and only if $Y(z) = X(z) H(z)$. As a result, an LTI system can be fully described by its transfer function $H(z) = \frac{Y(z)}{X(z)}$. If the LTI system is additionally casual, then the transfer function becomes a fraction of polynomials in the following order.
+The Z-transform has the convolution property that $y[n] = x[n] * h[n]$ if and
+only if $Y(z) = X(z) H(z)$. As a result, an LTI system can be fully described by
+its transfer function $H(z) = \frac{Y(z)}{X(z)}$. If the LTI system is
+additionally casual, then the transfer function becomes a fraction of
+polynomials in the following order.
 
 $$ H(z) = \frac{\sum_{n=0}^{N} b_k z^{-n}}{\sum_{m=0}^{N} a_k z^{-m}} $$
 
-The zeros of the system are the roots of the numerator and the poles of the system are the roots of the denominator.
+The zeros of the system are the roots of the numerator and the poles of the
+system are the roots of the denominator.
 
 <!-- prettier-ignore-end -->
-
-```python {.marimo}
-
-```

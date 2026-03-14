@@ -38,23 +38,85 @@ import melopa
 from melopa.source import SourceFile
 ```
 
-Audio filters remove aspects of a sound such as frequencies.
+Audio filters remove aspects of sound such as frequencies. Casual LTI filters
+are well described by their Z-transform.
 
-A discrete time system is defined as $y[n] = T\{x[n]\}$ as shown in the block
-diagram below.
+We'll start with a moving average filter.
 
 ```python {.marimo}
-mo.mermaid("""
----
-config:
-    theme: neutral
----
-
-stateDiagram
-    direction LR
-    x[n] --> y[n]: T{*}
-""")
+maf_code = f"""
+def moving_average(signal: NDArray, length: int) -> NDArray:
+    filter = numpy.ones(length) / length
+    return numpy.convolve(filter, signal, mode="same")
+""".strip()
+maf_editor = melopa.ui.editor(maf_code)
 ```
+
+```python {.marimo}
+maf_state, maf_audio = melopa.source.ui("templeofhades-scratch_sample.wav")
+maf_length_ui = mo.ui.slider(
+    1, 100, 1, debounce=True, label="Length", show_value=True, value=8
+)
+mo.ui.tabs(
+    {
+        "Code": maf_editor,
+        "Parameter": maf_length_ui,
+        "Signal": maf_audio,
+    },
+    label="Controls",
+)
+```
+
+```python {.marimo}
+maf_source = maf_state()
+maf_signal, maf_rate = maf_source.read()
+exec(maf_editor.value["editor"])
+maf_processed, maf_output = melopa.ui.run(
+    lambda: moving_average(maf_signal, maf_length_ui.value)
+)
+maf_output
+```
+
+```python {.marimo}
+maf_visual = melopa.plot.ui()
+mo.right(maf_visual)
+```
+
+```python {.marimo}
+melopa.plot.signal(
+    [
+        {"rate": maf_rate, "y": maf_signal, "legend_label": "original"},
+        {"rate": maf_rate, "y": maf_processed, "legend_label": "filtered"},
+    ],
+    title=maf_source.name(),
+    **maf_visual.value,
+)
+```
+
+We can listen to both versions of the signal below.
+
+```python {.marimo}
+mo.hstack(
+    [
+        mo.vstack([mo.md("### Original"), mo.audio(maf_signal, maf_rate)]),
+        mo.vstack([mo.md("### Filtered"), mo.audio(maf_processed, maf_rate)]),
+    ],
+    gap=2,
+    justify="start",
+)
+```
+
+## Finite Response
+
+## Infinite Response
+
+## Butterworth
+
+- Has no gain ripple.
+
+The following
+interface provides controls for a Butterworth low-pass filter, which attenuates high
+frequencies from a signal.
 
 ```python {.marimo}
 cutoff = mo.ui.slider(
@@ -81,6 +143,8 @@ melopa.plot.signal(
     y_range=(-100, 0),
 )
 ```
+
+We can apply the low-pass filter to any sound and visualized its affects below.
 
 ```python {.marimo}
 sample, rate_ = SourceFile("templeofhades-scratch_sample.wav").read()
