@@ -45,7 +45,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                 plot = figure(
                     x_axis_label="Frequency (Hz)",
                     x_axis_type="log",
-                    x_range=Range1d(20, 20_000),
+                    x_range=Range1d(start=20, end=20_000),
                     y_axis_label="Amplitude (dB)",
                     **kwargs,
                 )
@@ -55,7 +55,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             plot = figure(
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
-                x_range=Range1d(20, 20_000),
+                x_range=Range1d(start=20, end=20_000),
                 y_axis_label="Amplitude (dB)",
                 **kwargs,
             )
@@ -75,14 +75,18 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     """Plot audio waveform with Bokeh."""
     palette = util.palette_cycle()
-    x_range = Range1d(0, 0)
+    x_range_set = "x_range" in kwargs
+    x_range = Range1d(*kwargs.pop("x_range", (0, 0)))
+    y_range = Range1d(*kwargs.pop("y_range", (-1, 1)))
     plots = []
 
     for signal in signals:
         color = signal.pop("color", next(palette))
         method = signal.pop("method", "line")
         x, y = util.signal_waveform(signal)
-        x_range.end = max(x[-1], x_range.end)
+        if not x_range_set:
+            x_range.start = min(x[0], x_range.start)
+            x_range.end = max(x[-1], x_range.end)
 
         if plots:
             if overlay:
@@ -92,7 +96,7 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                     x_axis_label="Time (s)",
                     x_range=x_range,
                     y_axis_label="Amplitude",
-                    y_range=Range1d(-1, 1),
+                    y_range=y_range,
                     **kwargs,
                 )
                 plots.append(plot)
@@ -101,7 +105,7 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                 x_axis_label="Time (s)",
                 x_range=x_range,
                 y_axis_label="Amplitude",
-                y_range=Range1d(-1, 1),
+                y_range=y_range,
                 **kwargs,
             )
             plots.append(plot)

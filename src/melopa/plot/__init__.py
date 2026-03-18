@@ -1,7 +1,7 @@
 """Plotting interfaces."""
 
 from enum import StrEnum
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 
 import marimo
 from marimo import Html
@@ -60,7 +60,13 @@ def ui() -> marimo.ui.batch:
         value="Waveform",
     )
     overlay = marimo.ui.switch(label="Overlay", value=True)
-    return Html("<div>{backend}{kind}{overlay}</div>").batch(
+    return Html(
+        """
+<div style="display: flex; flex-direction: row; gap: 0.5rem;" >
+    {backend}{kind}{overlay}
+</div>
+        """.strip()
+    ).batch(
         backend=backend,  # ty:ignore[invalid-argument-type]
         kind=kind,  # ty:ignore[invalid-argument-type]
         overlay=overlay,  # ty:ignore[invalid-argument-type]
@@ -81,11 +87,13 @@ def signal(
 
     match kind.lower():
         case "spectrogram":
-            return module.spectrogram(signals, overlay, **kwargs)
+            plot = module.spectrogram(signals, overlay, **kwargs)
         case "spectrum":
-            return module.spectrum(signals, overlay, **kwargs)
+            plot = module.spectrum(signals, overlay, **kwargs)
         case "waveform":
-            return module.waveform(signals, overlay, **kwargs)
+            plot = module.waveform(signals, overlay, **kwargs)
         case _:
             message = f"Invalid choice '{kind}' for PlotKind."
             raise ValueError(message)
+
+    return cast("Html", plot)

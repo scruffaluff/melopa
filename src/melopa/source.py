@@ -237,7 +237,13 @@ def ui(default: str) -> tuple[State[Source], Html]:
         label="Upload File",
         on_change=lambda input_: set_file(SourceInput(input_)),
     )
-    return get_file, Html("<div>{file}{synth}{upload}</div>").batch(
+    return get_file, Html(
+        """
+<div style="display: flex; flex-direction: row; gap: 1rem;">
+    {file}{synth}{upload}
+</div>
+        """.strip()
+    ).batch(
         file=file,  # ty:ignore[invalid-argument-type]
         synth=synth,  # ty:ignore[invalid-argument-type]
         upload=upload,  # ty:ignore[invalid-argument-type]

@@ -13,7 +13,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.20.4
+marimo-version: 0.21.0
 title: Signal
 width: medium
 ---
@@ -47,15 +47,15 @@ below.
 ```python {.marimo}
 def _():
     freq = 2
-    time_c = numpy.linspace(0, 1, 256)
-    sine_c = numpy.sin(2 * numpy.pi * 2 * 256 * time_c)
+    time_c = numpy.linspace(-1, 1, 257)
+    sine_c = numpy.sin(2 * numpy.pi * 2 * 257 * time_c)
     delta_c = numpy.zeros(len(time_c))
-    delta_c[0] = 1
+    delta_c[128] = 1
 
-    time_d = numpy.linspace(0, 1, 32)
-    sine_d = numpy.sin(2 * numpy.pi * 2 * 32 * time_d)
+    time_d = numpy.linspace(-1, 1, 33)
+    sine_d = numpy.sin(2 * numpy.pi * 2 * 33 * time_d)
     delta_d = numpy.zeros(len(time_d))
-    delta_d[0] = 1
+    delta_d[16] = 1
 
     return bokeh.layouts.row(
         [
@@ -70,6 +70,7 @@ def _():
                     },
                 ],
                 title="Sine",
+                y_range=(-1.1, 1.1),
             ),
             melopa.plot.signal(
                 [
@@ -82,6 +83,7 @@ def _():
                     },
                 ],
                 title="Impulse",
+                y_range=(-1.1, 1.1),
             ),
         ],
         sizing_mode="stretch_width",
@@ -206,5 +208,10 @@ $$ H(z) = \frac{\sum_{n=0}^{N} b_k z^{-n}}{\sum_{m=0}^{N} a_k z^{-m}} $$
 
 The zeros of the system are the roots of the numerator and the poles of the
 system are the roots of the denominator.
+
+## References
+
+<a id="1">[1]</a>
+Oppenheim, Alan V., and Roland W. Schafer. [Discrete-Time Signal Processing](https://books.google.com/books/about/Discrete_time_Signal_Processing.html). Third edition, Pearson New international edition, Pearson, 2014. Always Learning.
 
 <!-- prettier-ignore-end -->

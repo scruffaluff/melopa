@@ -11,7 +11,7 @@ from marimo import Html
 def editor(code: str) -> Html:
     """Create a Marimo code editor."""
     get_code, set_code = marimo.state(code)
-    editor_ = marimo.ui.code_editor(get_code(), debounce=True, on_change=exec)
+    editor_ = marimo.ui.code_editor(get_code(), debounce=True)
     button = marimo.ui.button(
         on_click=lambda _: set_code(code), label=f"{marimo.icon('lucide:undo-2')}"
     )
@@ -23,7 +23,7 @@ def editor(code: str) -> Html:
   </div>
   {editor}
 </div>
-        """  # noqa: E501
+        """.strip()  # noqa: E501
     ).batch(
         button=button,
         editor=editor_,  # ty:ignore[invalid-argument-type]

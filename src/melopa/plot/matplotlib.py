@@ -2,10 +2,15 @@
 
 from typing import Any
 
+import matplotlib
 from matplotlib import pyplot
 from matplotlib.figure import Figure
 
 from melopa.plot import util
+
+# Disable Matplotlib font cache logs. Based on
+# https://github.com/matplotlib/matplotlib/issues/23326#issuecomment-1164772708.
+matplotlib.set_loglevel("critical")
 
 
 def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:

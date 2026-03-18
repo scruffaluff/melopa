@@ -13,7 +13,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.20.4
+marimo-version: 0.21.0
 title: Filter
 width: medium
 ---
@@ -38,8 +38,8 @@ import melopa
 from melopa.source import SourceFile
 ```
 
-Audio filters remove aspects of sound such as frequencies. Casual LTI filters
-are well described by their Z-transform.
+Audio filters change aspects of sound such as removing frequencies. Casual LTI
+filters are well described by their Z-transform.
 
 We'll start with a moving average filter.
 
