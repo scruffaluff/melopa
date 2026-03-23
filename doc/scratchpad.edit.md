@@ -26,7 +26,11 @@ import sys
 await __import__("micropip").install(
     "/melopa/data/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
+
+import bokeh
 import marimo as mo
+import numpy
+import scipy
 
 import melopa
 ```

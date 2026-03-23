@@ -87,12 +87,12 @@ def compress(
             amplitude[index] += (1 - ratio) * smoothing
 
     return gain * sign * amplitude
-""".strip()
-editor = melopa.ui.editor(code)
+"""
 ```
 
 ```python {.marimo}
-state, audio = melopa.source.ui("templeofhades-scratch_sample.wav")
+editor_ui = melopa.ui.editor(code)
+signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
 gain_ui = mo.ui.slider(
     1, 10, 0.01, debounce=True, label="Gain", show_value=True, value=1.0
 )
@@ -109,11 +109,11 @@ plot_ui = melopa.plot.ui()
 
 mo.ui.tabs(
     {
-        "Code": editor,
+        "Code": editor_ui,
+        "Signal": signal_ui,
         "Parameter": mo.hstack(
             [gain_ui, knee_ui, ratio_ui, threshold_ui], gap=2, justify="start"
         ),
-        "Signal": audio,
         "Plot": plot_ui,
     },
     label="Controls",
@@ -121,9 +121,9 @@ mo.ui.tabs(
 ```
 
 ```python {.marimo}
-source = state()
-signal, rate = source.read()
-exec(editor.value["editor"])
+signal_source = signal_state()
+signal, rate = signal_source.read()
+exec(editor_ui.value["editor"])
 processed, output = melopa.ui.run(
     lambda: compress(
         signal, gain_ui.value, knee_ui.value, ratio_ui.value, threshold_ui.value
@@ -132,28 +132,22 @@ processed, output = melopa.ui.run(
 output
 ```
 
-```python {.marimo unparsable="true"}
+```python {.marimo}
 melopa.plot.signal(
     [
         {"rate": rate, "y": signal, "legend_label": "original"},
         {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
-    title=source.name(),
+    title=signal_source.name(),
     **plot_ui.value,
 )
 ```
 
-We can listen to both versions of the signal below.
-
 ```python {.marimo}
-mo.hstack(
-    [
-        mo.vstack([mo.md("### Original"), mo.audio(signal, rate)]),
-        mo.vstack([mo.md("### Compressed"), mo.audio(processed, rate)]),
-    ],
-    gap=2,
-    justify="start",
-)
+melopa.ui.audio_list([
+    {"signal": signal, "rate": rate, "name": "Original"},
+    {"signal": processed, "rate": rate, "name": "Compressed"},
+])
 ```
 
 ## References

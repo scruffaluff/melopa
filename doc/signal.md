@@ -140,8 +140,7 @@ To demonstrate the transform, we'll implement it in code as the `dtf` function
 below and plot it for sine waves.
 
 ```python {.marimo}
-code_comp = mo.ui.code_editor(
-    """
+code = """
 def dft(x: NDArray) -> NDArray:
     N = len(x)
     w = 2 * numpy.pi / N
@@ -150,24 +149,23 @@ def dft(x: NDArray) -> NDArray:
     for k in range(size):
         X[k] = numpy.sum(x * numpy.exp(-1j * w * k * numpy.arange(N)))
     return X
-    """.strip()
-)
-code_comp
+"""
 ```
 
 ```python {.marimo}
-freq_comp = mo.ui.slider(0, 100, 1, label="Frequency", show_value=True, value=2)
-rate_comp = mo.ui.slider(0, 100, 1, label="Rate", show_value=True, value=50)
-mo.hstack([freq_comp, rate_comp], gap=2, justify="start")
+editor_ui = melopa.ui.editor(code)
+freq_ui = mo.ui.slider(0, 100, 1, label="Frequency", show_value=True, value=2)
+rate_ui = mo.ui.slider(0, 100, 1, label="Rate", show_value=True, value=50)
+mo.hstack([freq_ui, rate_ui], gap=2, justify="start")
 ```
 
 ```python {.marimo}
-exec(code_comp.value)
-
-time = numpy.linspace(0, 1, rate_comp.value)
-waveform = numpy.sin(2 * numpy.pi * freq_comp.value * rate_comp.value * time)
-freq = numpy.fft.rfftfreq(len(time), 1 / rate_comp.value)
-spectrum = dft(waveform)
+exec(editor_ui.value["editor"])
+time = numpy.linspace(0, 1, rate_ui.value)
+waveform = numpy.sin(2 * numpy.pi * freq_ui.value * rate_ui.value * time)
+freq = numpy.fft.rfftfreq(len(time), 1 / rate_ui.value)
+spectrum, output = melopa.ui.run(lambda: dft(waveform))
+output
 ```
 
 ```python {.marimo}

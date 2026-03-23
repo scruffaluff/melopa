@@ -1,33 +1,43 @@
 """Custom Marimo UI components."""
 
 import traceback
-from collections.abc import Callable
-from typing import cast
+from collections.abc import Callable, Iterable
+from typing import Any, cast
 
 import marimo
+import numpy
 from marimo import Html
+from numpy.typing import NDArray
+
+
+def audio_list(audios: Iterable[dict[str, Any]]) -> Html:
+    """Create a list of audio playback elements."""
+    items = []
+    for audio in audios:
+        item = marimo.audio(audio["signal"], audio["rate"])
+        if "name" in audio:
+            items.append(marimo.vstack([marimo.md(f"### {audio['name']}"), item]))
+        else:
+            items.append(item)
+    return marimo.hstack(items, gap=2, justify="start")
+
+
+def difference_matrix(
+    numerator: NDArray, denominator: NDArray, length: int = 0
+) -> Html:
+    """Create a Marimo matrix for difference equations."""
+    size = length or max(len(numerator), len(denominator))
+    matrix = numpy.array([
+        numpy.concat([numerator, numpy.zeros(size - len(numerator))]),
+        numpy.concat([denominator, numpy.zeros(size - len(denominator))]),
+    ])
+    return marimo.ui.matrix(matrix, debounce=True, row_labels=["b", "a"])
 
 
 def editor(code: str) -> Html:
     """Create a Marimo code editor."""
-    get_code, set_code = marimo.state(code)
-    editor_ = marimo.ui.code_editor(get_code(), debounce=True)
-    button = marimo.ui.button(
-        on_click=lambda _: set_code(code), label=f"{marimo.icon('lucide:undo-2')}"
-    )
-    return Html(
-        """
-<div>
-  <div style="align-items: end; display: flex; flex-direction: column; margin-bottom: 0.5rem;">
-    {button}
-  </div>
-  {editor}
-</div>
-        """.strip()  # noqa: E501
-    ).batch(
-        button=button,
-        editor=editor_,  # ty:ignore[invalid-argument-type]
-    )
+    editor_ = marimo.ui.code_editor(code.strip(), debounce=True)
+    return Html("<div>{editor}</div>").batch(editor=editor_)  # ty:ignore[invalid-argument-type]
 
 
 def run[T](func: Callable[[], T]) -> tuple[T, Html | None]:
