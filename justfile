@@ -165,7 +165,7 @@ _setup:
 
 # Run test suites.
 test *args:
-  uv run pytest --cov {{args}}
+  uv run pytest {{args}}
 
 # Wrapper to Uv.
 [no-exit-message]

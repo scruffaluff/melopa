@@ -38,7 +38,9 @@ import melopa
 from melopa.source import SourceFile
 ```
 
-Audio filters change aspects of sound such as removing frequencies. We'll start with a moving average filter.
+Audio filters are digital systems that modify features of sound. One common
+example is a low-pass filter which removes a band of lower frequencies. A very
+basic low-pass filter is a moving average system which is implemented below.
 
 ```python {.marimo}
 maf_editor_ui = melopa.ui.editor("""
@@ -46,7 +48,7 @@ def moving_average(signal: NDArray, length: int) -> NDArray:
     filter = numpy.ones(length) / length
     return numpy.convolve(filter, signal, mode="same")
 """)
-maf_signal_state, maf_signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
+maf_signal_state, maf_signal_ui = melopa.source.ui("claretcanelon-baby_parrot.wav")
 maf_length_ui = mo.ui.slider(
     1, 100, 1, debounce=True, label="Length", show_value=True, value=8
 )
@@ -91,12 +93,22 @@ melopa.ui.audio_list([
 ])
 ```
 
+The commonest class of audio filters are linear and time invariant (LTI)
+filters. Linear filter, while time invariant filters are.
+
 ## Difference Equation
 
-Casual LTI
-filters are well described by their Z-transform.
+It is often useful to analyze the class of LTI filters that are also casual,
+i.e. This filter is class is useful since their Z-transform can be expressed as
+a ratio of polynomials.
 
-$$ H(z) = \frac{\sum_{n=0}^{N} b_k z^{-n}}{\sum_{m=0}^{N} a_k z^{-m}} $$
+$$ H(z) = \frac{\sum_{n=0}^{N} b_n z^{-n}}{\sum_{m=0}^{M} a_m z^{-m}} $$
+
+For analytical convenience, these notebook assume that `a_0 = 1`. When
+Z-transform is a ratio of polynomials, its system can be expressed by the
+following difference equation.
+
+$$ y[k] = -\sum_{m=1}^{M} a_m y[k-m] + \sum_{n=0}^{N} b_n x[k-n] $$
 
 ```python {.marimo}
 de_rate = 48_000
@@ -120,15 +132,26 @@ melopa.plot.signal(
 
 ## Finite Response
 
+An finite impulse response (FIR) filter is an LTI filter whose output does not
+depend on previous outputs. Thus, its Z-transform has no denominator polynomial
+with form $H(z) = \sum_{n=0}^{N} b_n z^{-n}$ and its difference equation has
+form $y[k] = \sum_{n=0}^{N} b_n x[k-n]$.
+
 ## Infinite Response
+
+An infinite impulse response (IIR) filter, also called a recursive filter, is an
+LTI filter whose output does depend on previous outputs. Thus, its Z-transform
+has the full form
+$H(z) = \frac{\sum_{n=0}^{N} b_n z^{-n}}{\sum_{m=0}^{M} a_m z^{-m}}$ and its
+difference equation has form
+$y[k] = -\sum_{m=1}^{M} a_m y[k-m] + \sum_{n=0}^{N} b_n x[k-n]$.
 
 ## Butterworth
 
 - Has no gain ripple.
 
-The following
-interface provides controls for a Butterworth low-pass filter, which attenuates high
-frequencies from a signal.
+The following interface provides controls for a Butterworth low-pass filter,
+which attenuates high frequencies from a signal.
 
 ```python {.marimo}
 bw_cutoff_ui = mo.ui.slider(
@@ -161,7 +184,7 @@ melopa.plot.signal(
 We can apply the low-pass filter to any sound and visualized its affects below.
 
 ```python {.marimo}
-signal, rate = SourceFile("templeofhades-scratch_sample.wav").read()
+signal, rate = SourceFile("talitha5-cafe_ambience.wav").read()
 sos = scipy.signal.butter(10, 1000, "lowpass", fs=rate, output="sos")
 processed = scipy.signal.sosfilt(sos, signal)
 ```
@@ -186,6 +209,24 @@ melopa.ui.audio_list([
     {"signal": signal, "rate": rate, "name": "Original"},
     {"signal": processed, "rate": rate, "name": "Processed"},
 ])
+```
+
+## Biquad
+
+A biquad filter is a second order recursive filter containing two poles and two
+zeros. Thus, its transfer function is a ratio quadratic functions.
+
+```python {.marimo unparsable="true"}
+mo.mermaid("""
+---
+config:
+    theme: neutral
+---
+
+stateDiagram
+    direction LR
+    x[n] --> y[n]: T{*}
+""")
 ```
 
 <!-- prettier-ignore-end -->

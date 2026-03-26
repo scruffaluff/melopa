@@ -31,6 +31,7 @@ await __import__("micropip").install(
 
 import marimo as mo
 import numpy
+import scipy
 from numpy.typing import NDArray
 
 import melopa
@@ -39,7 +40,7 @@ import melopa
 Dynamic range compressors decrease the amplitude variation in audio by
 attenuating loud sounds and amplifying quiet sounds. A downward peak compressor
 only attenuates loud sounds above a specific amplitude. It is controlled by the
-following parameters which attached to their variable names.
+following parameters.
 
 - _Threshold (T)_ controls the minimum amplitude for compression to be applied.
   Any sample above the threshold is attenuated.
@@ -49,7 +50,7 @@ following parameters which attached to their variable names.
   threshold.
 - _Release_ controls how quickly compression is stopped after going below the
   threshold.
-- _Knee (K)_ softens the threshold transition by rounding its angle.
+- _Knee (K)_ softens the threshold transition by rounding its edge.
 - _Gain (G)_ applies additional volume to the signal after compression and
   compensates for the reduction in signal amplitude.
 
@@ -76,7 +77,7 @@ def compress(
     threshold: float = 0.8,
 ) -> NDArray:
     sign = numpy.sign(signal)
-    amplitude = numpy.abs(signal)
+    amplitude = level(signal)
 
     for index in range(len(amplitude)):
         value = amplitude[index] - threshold
@@ -87,6 +88,12 @@ def compress(
             amplitude[index] += (1 - ratio) * smoothing
 
     return gain * sign * amplitude
+
+
+def level(signal: NDArray) -> NDArray:
+    a = 0.1
+    amplitude = numpy.abs(signal)
+    return scipy.signal.lfilter([1 - a], [1, a], amplitude)
 """
 ```
 
@@ -136,6 +143,7 @@ output
 melopa.plot.signal(
     [
         {"rate": rate, "y": signal, "legend_label": "original"},
+        {"rate": rate, "y": level(signal), "legend_label": "level", "line_alpha": 0.5},
         {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
     title=signal_source.name(),

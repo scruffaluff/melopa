@@ -20,6 +20,7 @@ await __import__("micropip").install(
 import marimo as mo
 import numpy
 import scipy
+from numpy.typing import NDArray
 
 import melopa
 ```
@@ -150,7 +151,7 @@ def reverb(signal: NDArray, wet: float = 0.5) -> NDArray:
 
 ```python {.marimo}
 editor_ui = melopa.ui.editor(code)
-signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
+signal_state, signal_ui = melopa.source.ui("esperar-chicken_imitation.wav")
 wet_ui = mo.ui.slider(
     0, 1, 0.01, debounce=True, label="Wet", show_value=True, value=0.5
 )

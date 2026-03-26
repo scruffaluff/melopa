@@ -156,7 +156,7 @@ def dft(x: NDArray) -> NDArray:
 editor_ui = melopa.ui.editor(code)
 freq_ui = mo.ui.slider(0, 100, 1, label="Frequency", show_value=True, value=2)
 rate_ui = mo.ui.slider(0, 100, 1, label="Rate", show_value=True, value=50)
-mo.hstack([freq_ui, rate_ui], gap=2, justify="start")
+mo.vstack([mo.hstack([freq_ui, rate_ui], gap=2, justify="start"), editor_ui])
 ```
 
 ```python {.marimo}
@@ -206,6 +206,8 @@ $$ H(z) = \frac{\sum_{n=0}^{N} b_k z^{-n}}{\sum_{m=0}^{N} a_k z^{-m}} $$
 
 The zeros of the system are the roots of the numerator and the poles of the
 system are the roots of the denominator.
+
+<a href="/filter.html">Filters</a>
 
 ## References
 

@@ -9,7 +9,8 @@ from urllib import request
 
 import marimo
 import numpy
-from marimo import Html, ui
+from marimo import Html
+from marimo._plugins.ui._impl.input import FileUploadResults
 from marimo._runtime.state import State
 from numpy.typing import NDArray
 from scipy.io import wavfile
@@ -80,17 +81,17 @@ class SourceFile(Source):
 class SourceInput(Source):
     """Read signals from a Marimo input."""
 
-    def __init__(self, value: ui.file) -> None:
+    def __init__(self, value: FileUploadResults) -> None:
         """Create a SourceInput instance."""
         self._input = value
 
     def name(self) -> str:
         """Find name."""
-        return Path(self._input.name() or "").stem
+        return Path(self._input.name).stem
 
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""
-        rate, signal = wavfile.read(BytesIO(self._input.contents() or b""))
+        rate, signal = wavfile.read(BytesIO(self._input.contents))
         if len(signal.shape) > 1:
             signal = numpy.mean(signal, axis=1)
         return math.normalize(signal), rate
@@ -214,6 +215,26 @@ class SourceSquare(Source):
         return numpy.concatenate(int(self._freq * self._time) * (wave,)), self._rate
 
 
+def select(name: str) -> Source:
+    """Find source corresponding to given name."""
+    class_ = {
+        "impulse": SourceImpulse,
+        "linear": SourceLinear,
+        "none": SourceNone,
+        "sawtooth": SourceSawtooth,
+        "sine": SourceSine,
+        "square": SourceSquare,
+    }.get(name)
+    if class_ is None:
+        return SourceFile(name)
+    return class_()
+
+
+def synths() -> list[str]:
+    """Find list of synth source names."""
+    return ["impulse", "linear", "none", "sawtooth", "sine", "square"]
+
+
 def ui(default: str) -> tuple[State[Source], Html]:
     """Marimo input element to select an audio signal."""
     get_file, set_file = marimo.state(select(default))
@@ -235,7 +256,7 @@ def ui(default: str) -> tuple[State[Source], Html]:
         filetypes=[".wav"],
         kind="button",
         label="Upload File",
-        on_change=lambda input_: set_file(SourceInput(input_)),
+        on_change=lambda input_: set_file(SourceInput(input_[0])),
     )
     return get_file, Html(
         """
@@ -248,23 +269,3 @@ def ui(default: str) -> tuple[State[Source], Html]:
         synth=synth,  # ty:ignore[invalid-argument-type]
         upload=upload,  # ty:ignore[invalid-argument-type]
     )
-
-
-def select(name: str) -> Source:
-    """Find source corresponding to given name."""
-    class_ = {
-        "impulse": SourceImpulse,
-        "linear": SourceLinear,
-        "none": SourceNone,
-        "sawtooth": SourceSawtooth,
-        "sine": SourceSine,
-        "square": SourceSquare,
-    }.get(name)
-    if class_ is None:
-        return SourceFile(name)
-    return class_()
-
-
-def synths() -> list[str]:
-    """Find list of synth source names."""
-    return ["impulse", "linear", "none", "sawtooth", "sine", "square"]

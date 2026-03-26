@@ -8,6 +8,7 @@
 /.vitepress/dist/
 /build/
 /data/public/
+/doc/*.md
 deno.lock
 node_modules/
 tmp/
