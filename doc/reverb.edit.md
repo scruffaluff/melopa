@@ -1,12 +1,22 @@
 ---
-marimo-version: 0.21.0
+header: |-
+  # /// script
+  # dependencies = [
+  #   "bokeh~=3.6",
+  #   "matplotlib~=3.8",
+  #   "numpy~=2.2",
+  #   "plotly~=6.5",
+  #   "scipy~=1.14",
+  # ]
+  # requires-python = ">=3.12.0,<4.0.0"
+  #
+  # [tool.uv.sources]
+  # melopa = { editable = true, path = "src/melopa" }
+  # ///
+marimo-version: 0.21.1
 title: Reverb
 width: medium
 ---
-
-<!-- prettier-ignore-start -->
-<!-- Check if the lack of dependency specification in the header causes slower
-WASM loads. -->
 
 # Reverb
 
@@ -195,7 +205,7 @@ melopa.ui.audio_list([
 
 ## References
 
-<a id="1">[1]</a>
-Moorer, James A. [About This Reverberation Business.](https://www.researchgate.net/publication/239735102_About_This_Reverberation_Business) Computer Music Journal, vol. 3, no. 2, June 1979, p. 13. DOI.org (Crossref), https://doi.org/10.2307/3680280.
-
-<!-- prettier-ignore-end -->
+<a id="1">[1]</a> Moorer, James A.
+[About This Reverberation Business.](https://www.researchgate.net/publication/239735102_About_This_Reverberation_Business)
+Computer Music Journal, vol. 3, no. 2, June 1979, p. 13. DOI.org (Crossref),
+https://doi.org/10.2307/3680280.

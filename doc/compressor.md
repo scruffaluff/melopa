@@ -13,12 +13,10 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.21.0
+marimo-version: 0.21.1
 title: Compressor
 width: medium
 ---
-
-<!-- prettier-ignore-start -->
 
 # Compressor
 
@@ -160,10 +158,10 @@ melopa.ui.audio_list([
 
 ## References
 
-<a id="1">[1]</a>
-Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua. (2012). [Digital Dynamic Range Compressor Design—A Tutorial and Analysis](https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysis). AES: Journal of the Audio Engineering Society. 60.
+<a id="1">[1]</a> Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua.
+(2012).
+[Digital Dynamic Range Compressor Design—A Tutorial and Analysis](https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysis).
+AES: Journal of the Audio Engineering Society. 60.
 
-<a id="2">[2]</a>
-McCormack, Leo and Valimaki, Vesa and others. [FFT-based dynamic range compression](https://leomccormack.github.io/sparta-site/docs/help/related-publications/mccormack2017fft.pdf). 2017.
-
-<!-- prettier-ignore-end -->
+<a id="2">[2]</a> McCormack, Leo and Valimaki, Vesa and others.
+[FFT-based dynamic range compression](https://leomccormack.github.io/sparta-site/docs/help/related-publications/mccormack2017fft.pdf). 2017.

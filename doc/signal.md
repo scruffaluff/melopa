@@ -13,12 +13,10 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.21.0
+marimo-version: 0.21.1
 title: Signal
 width: medium
 ---
-
-<!-- prettier-ignore-start -->
 
 # Signal
 
@@ -211,7 +209,7 @@ system are the roots of the denominator.
 
 ## References
 
-<a id="1">[1]</a>
-Oppenheim, Alan V., and Roland W. Schafer. [Discrete-Time Signal Processing](https://books.google.com/books/about/Discrete_time_Signal_Processing.html). Third edition, Pearson New international edition, Pearson, 2014. Always Learning.
-
-<!-- prettier-ignore-end -->
+<a id="1">[1]</a> Oppenheim, Alan V., and Roland W. Schafer.
+[Discrete-Time Signal Processing](https://books.google.com/books/about/Discrete_time_Signal_Processing.html).
+Third edition, Pearson New international edition, Pearson, 2014. Always
+Learning.

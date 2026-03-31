@@ -3,7 +3,7 @@
 from typing import Any
 
 from bokeh import layouts, plotting
-from bokeh.models import FixedTicker, Legend, Pane, Range1d
+from bokeh.models import ColumnDataSource, FixedTicker, Legend, Pane, Range1d
 
 from melopa.plot import util
 
@@ -14,7 +14,7 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
         *args,
         output_backend="webgl",
         sizing_mode="stretch_width",
-        tools="pan,box_zoom,wheel_zoom,save,reset,undo,redo",
+        tools="fullscreen,pan,box_zoom,wheel_zoom,undo,redo,reset,save",
         **kwargs,
     )
     figure_.add_layout(Legend(click_policy="mute"))
@@ -37,6 +37,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
         color = signal.pop("color", next(palette))
         method = signal.pop("method", "line")
         x, y = util.signal_spectrum(signal)
+        source = ColumnDataSource(data={"x": x, "y": y})
 
         if plots:
             if overlay:
@@ -45,7 +46,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                 plot = figure(
                     x_axis_label="Frequency (Hz)",
                     x_axis_type="log",
-                    x_range=Range1d(start=20, end=20_000),
+                    x_range=Range1d(start=20, end=20_000, bounds="auto"),
                     y_axis_label="Amplitude (dB)",
                     **kwargs,
                 )
@@ -55,7 +56,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             plot = figure(
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
-                x_range=Range1d(start=20, end=20_000),
+                x_range=Range1d(start=20, end=20_000, bounds="auto"),
                 y_axis_label="Amplitude (dB)",
                 **kwargs,
             )
@@ -63,10 +64,11 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             plots.append(plot)
 
         getattr(plot, method)(
-            x=x,
-            y=y,
+            x="x",
+            y="y",
             color=color,
             line_width=2,
+            source=source,
             **signal,
         )
     return layouts.row(plots, sizing_mode="stretch_width")
@@ -76,14 +78,15 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     """Plot audio waveform with Bokeh."""
     palette = util.palette_cycle()
     x_range_set = "x_range" in kwargs
-    x_range = Range1d(*kwargs.pop("x_range", (0, 0)))
-    y_range = Range1d(*kwargs.pop("y_range", (-1, 1)))
+    x_range = Range1d(*kwargs.pop("x_range", (0, 0)), bounds="auto")
+    y_range = Range1d(*kwargs.pop("y_range", (-1, 1)), bounds="auto")
     plots = []
 
     for signal in signals:
         color = signal.pop("color", next(palette))
         method = signal.pop("method", "line")
         x, y = util.signal_waveform(signal)
+        source = ColumnDataSource(data={"x": x, "y": y})
         if not x_range_set:
             x_range.start = min(x[0], x_range.start)
             x_range.end = max(x[-1], x_range.end)
@@ -111,10 +114,11 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             plots.append(plot)
 
         getattr(plot, method)(
-            x=x,
-            y=y,
+            x="x",
+            y="y",
             color=color,
             line_width=2,
+            source=source,
             **signal,
         )
     return layouts.row(plots, sizing_mode="stretch_width")

@@ -13,12 +13,10 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.21.0
+marimo-version: 0.21.1
 title: Filter
 width: medium
 ---
-
-<!-- prettier-ignore-start -->
 
 # Filter
 
@@ -228,5 +226,3 @@ stateDiagram
     x[n] --> y[n]: T{*}
 """)
 ```
-
-<!-- prettier-ignore-end -->
