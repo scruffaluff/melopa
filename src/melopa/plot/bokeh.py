@@ -1,11 +1,26 @@
 """Plotting routines with Bokeh."""
 
+from pathlib import Path
 from typing import Any
 
-from bokeh import layouts, plotting
-from bokeh.models import ColumnDataSource, FixedTicker, Legend, Pane, Range1d
+from bokeh import io, layouts, plotting
+from bokeh.events import DocumentReady, RangesUpdate
+from bokeh.models import ColumnDataSource, CustomJS, FixedTicker, Legend, Pane, Range1d
 
 from melopa.plot import util
+
+
+def add_downsample(
+    plot: plotting.figure, source: ColumnDataSource, size: int = 65_536
+) -> None:
+    """Add JavaScript downsampling callbacks to Bokeh plot."""
+    callback = CustomJS.from_file(
+        Path(__file__).parents[1] / "downsample.mjs",
+        size=size,
+        source=source,
+    )
+    io.curdoc().js_on_event(DocumentReady, callback)
+    plot.js_on_event(RangesUpdate, callback)
 
 
 def figure(*args: Any, **kwargs: Any) -> plotting.figure:
@@ -27,7 +42,9 @@ def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pan
     raise NotImplementedError
 
 
-def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
+def spectrum(
+    signals: list[dict], overlay: bool = True, size: int = 65_536, **kwargs: Any
+) -> Pane:
     """Plot audio frequency spectrum with Bokeh."""
     palette = util.palette_cycle()
     plots = []
@@ -71,10 +88,13 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             source=source,
             **signal,
         )
+        add_downsample(plot, source, size)
     return layouts.row(plots, sizing_mode="stretch_width")
 
 
-def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
+def waveform(
+    signals: list[dict], overlay: bool = True, size: int = 65_536, **kwargs: Any
+) -> Pane:
     """Plot audio waveform with Bokeh."""
     palette = util.palette_cycle()
     x_range_set = "x_range" in kwargs
@@ -121,4 +141,6 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             source=source,
             **signal,
         )
+        add_downsample(plot, source, size)
+
     return layouts.row(plots, sizing_mode="stretch_width")
