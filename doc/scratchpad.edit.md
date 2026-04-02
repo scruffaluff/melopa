@@ -7,7 +7,6 @@ header: |-
   #   "matplotlib~=3.8",
   #   "numpy~=2.2",
   #   "polars~=1.36",
-  #   "plotly~=6.5",
   #   "scipy~=1.14",
   # ]
   # requires-python = ">=3.12.0,<4.0.0"
@@ -16,7 +15,7 @@ header: |-
   # melopa = { editable = true, path = "src/melopa" }
   # ///
 title: Scratchpad
-marimo-version: 0.21.1
+marimo-version: 0.22.0
 width: medium
 ---
 

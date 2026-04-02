@@ -5,7 +5,6 @@ header: |-
   #   "bokeh~=3.6",
   #   "matplotlib~=3.8",
   #   "numpy~=2.2",
-  #   "plotly~=6.5",
   #   "scipy~=1.14",
   # ]
   # requires-python = ">=3.12.0,<4.0.0"
@@ -13,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.21.1
+marimo-version: 0.22.0
 title: Signal
 width: medium
 ---

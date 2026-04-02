@@ -17,7 +17,7 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
         tools="fullscreen,pan,box_zoom,wheel_zoom,undo,redo,reset,save",
         **kwargs,
     )
-    figure_.add_layout(Legend(click_policy="mute"))
+    figure_.add_layout(Legend(click_policy="hide"))
     figure_.toolbar.logo = None
     return figure_
 
@@ -46,7 +46,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
                 plot = figure(
                     x_axis_label="Frequency (Hz)",
                     x_axis_type="log",
-                    x_range=Range1d(start=20, end=20_000, bounds="auto"),
+                    x_range=Range1d(start=20, end=20_000),
                     y_axis_label="Amplitude (dB)",
                     **kwargs,
                 )
@@ -56,7 +56,7 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
             plot = figure(
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
-                x_range=Range1d(start=20, end=20_000, bounds="auto"),
+                x_range=Range1d(start=20, end=20_000),
                 y_axis_label="Amplitude (dB)",
                 **kwargs,
             )
@@ -78,8 +78,8 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Pane:
     """Plot audio waveform with Bokeh."""
     palette = util.palette_cycle()
     x_range_set = "x_range" in kwargs
-    x_range = Range1d(*kwargs.pop("x_range", (0, 0)), bounds="auto")
-    y_range = Range1d(*kwargs.pop("y_range", (-1, 1)), bounds="auto")
+    x_range = Range1d(*kwargs.pop("x_range", (0, 0)))
+    y_range = Range1d(*kwargs.pop("y_range", (-1, 1)))
     plots = []
 
     for signal in signals:

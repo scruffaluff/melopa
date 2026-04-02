@@ -6,10 +6,11 @@ from typing import Any, NamedTuple, cast
 import marimo
 from marimo import Html
 
-from melopa.plot import bokeh, matplotlib, plotly
+from melopa.plot import bokeh, matplotlib
 from melopa.plot.bokeh import figure
 
-__all__ = ["bokeh", "figure", "matplotlib", "plotly"]
+__all__ = ["bokeh", "figure", "matplotlib"]
+__version__ = "0.1.0"
 
 
 class Options(StrEnum):
@@ -26,7 +27,6 @@ class Backend(Options):
 
     Bokeh = "bokeh"
     Matplotlib = "matplotlib"
-    Plotly = "plotly"
 
 
 class Kind(Options):
@@ -81,9 +81,7 @@ def signal(
     **kwargs: Any,
 ) -> Html:
     """Plot audio signals."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib, "plotly": plotly}[
-        backend.lower()
-    ]
+    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
 
     match kind.lower():
         case "spectrogram":

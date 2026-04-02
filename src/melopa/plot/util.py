@@ -29,7 +29,8 @@ def signal_spectrum(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
         length = 2 * (len(y) - 1)
         rate = signal.pop("rate")
         x = numpy.fft.rfftfreq(length, 1 / rate)
-    return x, y
+
+    return x.astype(numpy.float32), y.astype(numpy.float32)
 
 
 def signal_waveform(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
@@ -40,7 +41,8 @@ def signal_waveform(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
     else:
         rate = signal.pop("rate")
         x = numpy.linspace(0, len(y) / rate, len(y))
-    return x, y
+
+    return x.astype(numpy.float32), y.astype(numpy.float32)
 
 
 def spectrum_ticks() -> tuple[list[float], list[str]]:

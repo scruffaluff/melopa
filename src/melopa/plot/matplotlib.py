@@ -46,14 +46,13 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure
         if legend:
             axis.legend()
         axis.minorticks_off()
+    figure.tight_layout()
     return figure
 
 
 def subplots(*args: Any, **kwargs: Any) -> tuple[Figure, Any]:
     """Melopa wrapper for Matplotlib subplots."""
-    figure_, axes = pyplot.subplots(*args, figsize=(12, 6), **kwargs)
-    figure_.tight_layout()
-    return figure_, axes
+    return pyplot.subplots(*args, figsize=(12, 6), **kwargs)
 
 
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
@@ -76,4 +75,5 @@ def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure
         axis.set_ylim(-1.0, 1.0)
         if legend:
             axis.legend()
+    figure.tight_layout()
     return figure

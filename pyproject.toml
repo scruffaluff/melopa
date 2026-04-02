@@ -4,8 +4,8 @@
 # https://snarky.ca/what-the-heck-is-pyproject-toml.
 
 [build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling~=1.0"]
+build-backend = "uv_build"
+requires = ["uv-build~=0.11"]
 
 [dependency-groups]
 dev = [
@@ -24,10 +24,9 @@ dev = [
 # Dependency constraints must be flexible for WASM compatibility with Micropip.
 dependencies = [
   "bokeh~=3.6",
-  "marimo~=0.21.0",
+  "marimo~=0.22.0",
   "matplotlib~=3.8",
   "numpy~=2.0",
-  "plotly~=6.5",
   "scipy~=1.14",
   "soundfile~=0.13.0",
 ]
@@ -52,9 +51,6 @@ branch = true
 command_line = "-m pytest"
 omit = []
 source = ["melopa"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/melopa"]
 
 [tool.marimo]
 display = { custom_css = ["data/marimo.css"] }
@@ -106,3 +102,6 @@ select = ["ALL"]
 
 [tool.ty]
 terminal = { error-on-warning = true }
+
+[tool.uv.build-backend]
+source-exclude = ["*.test.ts", "*_test.py"]
