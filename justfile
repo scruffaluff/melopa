@@ -164,7 +164,14 @@ _setup:
   Write-Output "Using Nushell $(nu --version)."
 
 # Run test suites.
-test *args:
+test: test-js test-py
+
+# Run JavaScript test suite.
+test-js +args='run':
+  deno run --allow-all npm:vitest {{args}}
+
+# Run Python test suite.
+test-py *args:
   uv run pytest {{args}}
 
 # Wrapper to Uv.

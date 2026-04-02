@@ -15,9 +15,7 @@ def palette_cycle() -> itertools.cycle:
     return itertools.cycle(Category10[10])
 
 
-def signal_spectrum(
-    signal: dict[str, Any], size: int = 65_536
-) -> tuple[NDArray, NDArray]:
+def signal_spectrum(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
     """Extract frequency spectrum from signal dictionary."""
     if "f" in signal:
         y = signal.pop("f")
@@ -35,9 +33,7 @@ def signal_spectrum(
     return x.astype(numpy.float32), y.astype(numpy.float32)
 
 
-def signal_waveform(
-    signal: dict[str, Any], size: int = 65_536
-) -> tuple[NDArray, NDArray]:
+def signal_waveform(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
     """Extract waveform from signal dictionary."""
     y = signal.pop("y")
     if "x" in signal:
