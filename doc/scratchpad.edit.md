@@ -47,13 +47,15 @@ melopa.plot.signal(
         {"rate": rate, "y": signal, "legend_label": "original"},
         {"rate": rate, "y": processed, "legend_label": "processed"},
     ],
+    backend="bokeh",
     kind="waveform",
+    overlay=True,
 )
 ```
 
 ```python {.marimo}
 melopa.ui.audio_list([
     {"signal": signal, "rate": rate, "name": "Original"},
-    {"signal": processed, "rate": rate, "name": "Compressed"},
+    {"signal": processed, "rate": rate, "name": "Processed"},
 ])
 ```

@@ -110,27 +110,28 @@ stateDiagram
 
 The class of linear and time invariant (LTI) systems are often used in audio
 processing for their properties. Each LTI system $T$ in this class can be
-rewritten as a convolution of its impulse response $h[n]$, i.e. its output to the
-impulse signal, as follows.
+rewritten as a convolution of its impulse response $h[n]$, i.e. its output to
+the impulse signal, as follows.
 
 $$ T(x[n]) = \sum_{k=-\infty}^{\infty} x[n] h[n-k] = x[n] * h[n] $$
 
 ## Fourier Transform
 
-A transform maps signals from one domain to another domain. One of
-the most useful transforms is the [discrete Fourier
-transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform), which
-converts a discrete signals from the time domain to the frequency domain.
+A transform maps signals from one domain to another domain. One of the most
+useful transforms is the
+[discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform),
+which converts a discrete signals from the time domain to the frequency domain.
 
 Let's consider a signal $x[n]$ of length $N$ and sampling period $T$. The signal
-has sampling frequency $\frac{1}{T}$ and angular frequency $w =
-\frac{2\pi}{NT}$. The following equations describe the relationships between
-signal $x[n]$ and its Fourier transform $X[k]$.
+has sampling frequency $\frac{1}{T}$ and angular frequency $a =
+\frac{2\pi}{NT}$.
+The following equations describe the relationships between signal $x[n]$ and its
+Fourier transform $X[k]$.
 
 $$
-X[k] = \sum_{n=0}^{N-1} x[n] e^{-iwkn}
+X[k] = \sum_{n=0}^{N-1} x[n] e^{-iakn}
 \newline
-x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] e^{iwkn}
+x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] e^{iakn}
 $$
 
 To demonstrate the transform, we'll implement it in code as the `dtf` function
@@ -205,6 +206,25 @@ The zeros of the system are the roots of the numerator and the poles of the
 system are the roots of the denominator.
 
 <a href="/filter.html">Filters</a>
+
+## Short Time Fourier Transform
+
+The discrete Fourier transform decomposes the entire signal into frequency
+components. If we want to analyze the change in frequency components over time,
+then we can use the [discrete short-time Fourier
+transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform#Discrete-time_STFT)
+(STFT). The STFT divides the Fourier transform input into time segments by using
+a window function $w[m]$. The Guassian windo
+
+$$ w[n] = e^{0.5 (\frac{n - N/2}{\sigma N / 2})^2} $$
+
+The STFT
+
+$$
+X[m, k] = \sum_{n=0}^{N-1} x[n] w[n-m] e^{-iakn}
+\newline
+x[n] = \frac{1}{w[n-m] * N} \sum_{k=0}^{N-1} X[m, k] e^{iakn}
+$$
 
 ## References
 

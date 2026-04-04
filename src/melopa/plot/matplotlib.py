@@ -13,7 +13,7 @@ from melopa.plot import util
 matplotlib.set_loglevel("critical")
 
 
-def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
+def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
     """Plot audio frequency time heatmap with Matplotlib."""
     raise NotImplementedError
 
@@ -21,59 +21,68 @@ def spectrogram(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Fig
 def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     """Plot audio frequency spectrum with Matplotlib."""
     palette = util.palette_cycle()
-    legend = False
-    figure, axes = subplots(ncols=1 if overlay else len(signals))
+    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+
+    figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
+    axes = axes[0]
+    axes[0].set_ylabel("Amplitude (dB)")
     ticks = util.spectrum_ticks()
-    x_range = kwargs.pop("x_range", (20, 20_000))
-    y_range = kwargs.pop("y_range", None)
 
     for index, signal in enumerate(signals):
+        color = signal.pop("color", next(palette))
         label = signal.pop("legend_label", None)
-        legend = legend or (label is not None)
         x, y = util.signal_spectrum(signal)
+        y_range += (y.min(), y.max())
 
-        axis = axes if overlay else axes[index]
-        axis.semilogx(x, y, color=next(palette), label=signal.pop("legend_label", None))
+        axis = axes[0 if overlay else index]
+        axis.semilogx(x, y, color=color, label=label)
         axis.set_title(kwargs.pop("title", None))
         axis.set_xlabel("Frequency (Hz)")
-        axis.set_xlim(*x_range)
         axis.set_xticks(ticks[0])
         axis.set_xticklabels(ticks[1])
-        if index == 0:
-            axis.set_ylabel("Amplitude (dB)")
-        if y_range is not None:
-            axis.set_ylim(*y_range)
-        if legend:
+        if label:
             axis.legend()
         axis.minorticks_off()
-    figure.tight_layout()
+
+    for axis in axes:
+        if x_range.valid():
+            axis.set_xlim(x_range.start, x_range.stop)
+        if y_range.valid():
+            axis.set_ylim(y_range.start, y_range.stop)
     return figure
 
 
 def subplots(*args: Any, **kwargs: Any) -> tuple[Figure, Any]:
     """Melopa wrapper for Matplotlib subplots."""
-    return pyplot.subplots(*args, figsize=(12, 6), **kwargs)
+    return pyplot.subplots(*args, figsize=(12, 6), layout="compressed", **kwargs)
 
 
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     """Plot audio waveform with Matplotlib."""
     palette = util.palette_cycle()
-    legend = False
-    figure, axes = subplots(ncols=1 if overlay else len(signals))
+    x_range, y_range = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
+
+    figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
+    axes = axes[0]
+    axes[0].set_ylabel("Amplitude")
 
     for index, signal in enumerate(signals):
+        color = signal.pop("color", next(palette))
         label = signal.pop("legend_label", None)
-        legend = legend or (label is not None)
         x, y = util.signal_waveform(signal)
+        x_range += (x[0], x[-1])
+        y_range += (y.min(), y.max())
 
-        axis = axes if overlay else axes[index]
-        axis.plot(x, y, color=next(palette), label=label)
+        axis = axes[0 if overlay else index]
+        axis.plot(x, y, color=color, label=label)
         axis.set_title(kwargs.pop("title", None))
         axis.set_xlabel("Time (s)")
-        if index == 0:
-            axis.set_ylabel("Amplitude")
-        axis.set_ylim(-1.0, 1.0)
-        if legend:
+        if label:
             axis.legend()
-    figure.tight_layout()
+
+    for axis in axes:
+        if x_range.valid():
+            axis.set_xlim(x_range.start, x_range.stop)
+        if y_range.valid():
+            axis.set_ylim(y_range.start, y_range.stop)
     return figure

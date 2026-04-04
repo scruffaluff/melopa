@@ -85,7 +85,7 @@ def signal(
 
     match kind.lower():
         case "spectrogram":
-            plot = module.spectrogram(signals, overlay, **kwargs)
+            plot = module.spectrogram(signals, **kwargs)
         case "spectrum":
             plot = module.spectrum(signals, overlay, **kwargs)
         case "waveform":

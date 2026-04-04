@@ -1,13 +1,56 @@
 """Utility functions for plotting."""
 
+import dataclasses
 import itertools
-from typing import Any
+from typing import Any, Self
 
 import numpy
 from bokeh.palettes import Category10
 from numpy.typing import NDArray
 
 from melopa import math
+
+
+@dataclasses.dataclass
+class Range:
+    """Plot axis range with support for expanding bounds."""
+
+    start: float = numpy.inf
+    stop: float = -numpy.inf
+    fixed: bool = False
+
+    def __iadd__(self, other: tuple[float, float]) -> Self:
+        """Expand bounds if necessary."""
+        if not self.fixed:
+            self.start = min(other[0], self.start)
+            self.stop = max(other[1], self.stop)
+        return self
+
+    def valid(self) -> bool:
+        """Check if bounds are valid."""
+        return self.start < self.stop
+
+
+def axis_ranges(
+    kwargs: dict[str, Any],
+    x_range: tuple[float, float] | None = None,
+    y_range: tuple[float, float] | None = None,
+) -> tuple[Range, Range]:
+    """Parse axis ranges from plot keyword arguments."""
+    if "x_range" in kwargs:
+        x_range_ = Range(kwargs["x_range"][0], kwargs["x_range"][1], True)
+    elif x_range is None:
+        x_range_ = Range()
+    else:
+        x_range_ = Range(x_range[0], x_range[1])
+
+    if "y_range" in kwargs:
+        y_range_ = Range(kwargs["y_range"][0], kwargs["y_range"][1], True)
+    elif y_range is None:
+        y_range_ = Range()
+    else:
+        y_range_ = Range(y_range[0], y_range[1])
+    return x_range_, y_range_
 
 
 def palette_cycle() -> itertools.cycle:
