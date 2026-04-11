@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.22.0
+marimo-version: 0.23.0
 title: Compressor
 width: medium
 ---
@@ -34,10 +34,10 @@ from numpy.typing import NDArray
 import melopa
 ```
 
-Dynamic range compressors decrease the amplitude variation in audio by
-attenuating loud sounds and amplifying quiet sounds. A downward peak compressor
-only attenuates loud sounds above a specific amplitude. It is controlled by the
-following parameters.
+Dynamic range compressors narrow the volume bandwidth in audio by attenuating
+loud sounds or amplifying quiet sounds. A compressor that only attenuates loud
+sounds is called a downward peak compressor. The compressor calculates the
+current volume of the signal and then uses the following parameters.
 
 - _Threshold (T)_ controls the minimum amplitude for compression to be applied.
   Any sample above the threshold is attenuated.

@@ -44,6 +44,67 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
     return figure_
 
 
+def phase(
+    signals: list[dict], overlay: bool = True, size: int = 65_536, **kwargs: Any
+) -> Pane:
+    """Plot audio frequency phase with Bokeh."""
+    plots = []
+    palette = util.palette_cycle()
+    ticks = util.spectrum_ticks()
+    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+
+    for signal in signals:
+        color = signal.pop("color", next(palette))
+        method = signal.pop("method", "line")
+        x, y = util.signal_phase(signal)
+        y_range += (y.min(), y.max())
+        source = ColumnDataSource(data={"x": x, "y": y})
+
+        if plots:
+            if overlay:
+                plot = plots[0]
+            else:
+                plot = figure(
+                    x_axis_label="Frequency (Hz)",
+                    x_axis_type="log",
+                    **kwargs,
+                )
+                plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
+                plots.append(plot)
+        else:
+            plot = figure(
+                x_axis_label="Frequency (Hz)",
+                x_axis_type="log",
+                y_axis_label="Phase (rad)",
+                **kwargs,
+            )
+            plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
+            plots.append(plot)
+
+        getattr(plot, method)(
+            x="x",
+            y="y",
+            color=color,
+            line_width=2,
+            source=source,
+            **signal,
+        )
+        add_downsample(plot, source, size)
+
+    if x_range.valid():
+        plots[0].x_range = Range1d(start=x_range.start, end=x_range.stop)
+    if y_range.valid():
+        plots[0].y_range = Range1d(start=y_range.start, end=y_range.stop)
+    for plot in plots[1:]:
+        plot.x_range = plots[0].x_range
+        plot.y_range = plots[0].y_range
+    return layouts.gridplot(
+        [plots],
+        sizing_mode="stretch_width",
+        toolbar_location="above",
+    )
+
+
 def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
     """Plot audio frequency time heatmap with Bokeh."""
     raise NotImplementedError
@@ -80,6 +141,7 @@ def spectrum(
             plot = figure(
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
+                y_axis_label="Volume (dB)",
                 **kwargs,
             )
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])

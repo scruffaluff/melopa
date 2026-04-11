@@ -9,6 +9,7 @@ from urllib import request
 
 import marimo
 import numpy
+import scipy
 from marimo import Html
 from marimo._plugins.ui._impl.input import FileUploadResults
 from marimo._runtime.state import State
@@ -30,6 +31,24 @@ class Source(ABC):
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""
         raise NotImplementedError
+
+
+class SourceChirp(Source):
+    """Generate chirp signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 2.0) -> None:
+        """Create a SourceChirp instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "impulse"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        time = numpy.linspace(0, self._time, int(self._time * self._rate))
+        return scipy.signal.chirp(time, f0=80, f1=4000, t1=self._time), self._rate
 
 
 class SourceFile(Source):
@@ -218,6 +237,7 @@ class SourceSquare(Source):
 def select(name: str) -> Source:
     """Find source corresponding to given name."""
     class_ = {
+        "chirp": SourceChirp,
         "impulse": SourceImpulse,
         "linear": SourceLinear,
         "none": SourceNone,
@@ -232,7 +252,7 @@ def select(name: str) -> Source:
 
 def synths() -> list[str]:
     """Find list of synth source names."""
-    return ["impulse", "linear", "none", "sawtooth", "sine", "square"]
+    return ["chirp", "impulse", "linear", "none", "sawtooth", "sine", "square"]
 
 
 def ui(default: str) -> tuple[State[Source], Html]:

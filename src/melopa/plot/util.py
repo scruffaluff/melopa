@@ -7,6 +7,7 @@ from typing import Any, Self
 import numpy
 from bokeh.palettes import Category10
 from numpy.typing import NDArray
+from scipy.signal import ShortTimeFFT
 
 from melopa import math
 
@@ -56,6 +57,45 @@ def axis_ranges(
 def palette_cycle() -> itertools.cycle:
     """Create a cycle of colors for plotting."""
     return itertools.cycle(Category10[10])
+
+
+def signal_phase(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
+    """Extract frequency phase from signal dictionary."""
+    if "f" in signal:
+        y = signal.pop("f")
+    else:
+        y_ = signal.pop("y")
+        y = numpy.unwrap(numpy.angle(numpy.fft.rfft(y_)))
+
+    if "x" in signal:
+        x = signal.pop("x")
+    else:
+        length = 2 * (len(y) - 1)
+        rate = signal.pop("rate")
+        x = numpy.fft.rfftfreq(length, 1 / rate)
+
+    return x.astype(numpy.float32), y.astype(numpy.float32)
+
+
+def signal_spectrogram(signal: dict[str, Any]) -> tuple[NDArray, NDArray, NDArray]:
+    """Extract time binned frequency spectrum from signal dictionary."""
+    y_ = signal.pop("y")
+    rate = signal.pop("rate")
+    length = len(y_)
+
+    transform = ShortTimeFFT.from_window(
+        ("gaussian", 1e-2 * rate),
+        fft_mode="onesided",
+        fs=rate,
+        noverlap=64,
+        nperseg=512,
+    )
+    bounds = transform.extent(length, center_bins=True)
+
+    z = math.decibel(transform.stft(y_))
+    x = numpy.linspace(bounds[0], bounds[1], num=z.shape[1], dtype=numpy.float32)
+    y = numpy.linspace(bounds[2], bounds[3], num=z.shape[0], dtype=numpy.float32)
+    return x, y, z.astype(numpy.float32)
 
 
 def signal_spectrum(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:

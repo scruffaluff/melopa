@@ -13,6 +13,40 @@ from melopa.plot import util
 matplotlib.set_loglevel("critical")
 
 
+def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
+    """Plot audio frequency spectrum with Matplotlib."""
+    palette = util.palette_cycle()
+    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+
+    figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
+    axes = axes[0]
+    axes[0].set_ylabel("Phase (rad)")
+    ticks = util.spectrum_ticks()
+
+    for index, signal in enumerate(signals):
+        color = signal.pop("color", next(palette))
+        label = signal.pop("legend_label", None)
+        x, y = util.signal_phase(signal)
+        y_range += (y.min(), y.max())
+
+        axis = axes[0 if overlay else index]
+        axis.semilogx(x, y, color=color, label=label)
+        axis.set_title(kwargs.pop("title", None))
+        axis.set_xlabel("Frequency (Hz)")
+        axis.set_xticks(ticks[0])
+        axis.set_xticklabels(ticks[1])
+        if label:
+            axis.legend()
+        axis.minorticks_off()
+
+    for axis in axes:
+        if x_range.valid():
+            axis.set_xlim(x_range.start, x_range.stop)
+        if y_range.valid():
+            axis.set_ylim(y_range.start, y_range.stop)
+    return figure
+
+
 def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
     """Plot audio frequency time heatmap with Matplotlib."""
     raise NotImplementedError
@@ -21,12 +55,12 @@ def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
 def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     """Plot audio frequency spectrum with Matplotlib."""
     palette = util.palette_cycle()
+    ticks = util.spectrum_ticks()
     x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
     axes = axes[0]
-    axes[0].set_ylabel("Amplitude (dB)")
-    ticks = util.spectrum_ticks()
+    axes[0].set_ylabel("Volume (dB)")
 
     for index, signal in enumerate(signals):
         color = signal.pop("color", next(palette))

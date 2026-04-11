@@ -32,6 +32,7 @@ class Backend(Options):
 class Kind(Options):
     """Plot types."""
 
+    Phase = "phase"
     Spectrogram = "spectrogram"
     Spectrum = "spectrum"
     Waveform = "waveform"
@@ -84,6 +85,8 @@ def signal(
     module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
 
     match kind.lower():
+        case "phase":
+            plot = module.phase(signals, overlay, **kwargs)
         case "spectrogram":
             plot = module.spectrogram(signals, **kwargs)
         case "spectrum":

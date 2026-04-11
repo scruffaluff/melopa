@@ -15,7 +15,7 @@ header: |-
   # melopa = { editable = true, path = "src/melopa" }
   # ///
 title: Scratchpad
-marimo-version: 0.22.0
+marimo-version: 0.23.0
 width: medium
 ---
 

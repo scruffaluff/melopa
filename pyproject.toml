@@ -16,15 +16,15 @@ dev = [
   "pytest-mock~=3.15",
   "python-lsp-server~=1.14",
   "pyzmq~=27.1",
-  "ruff~=0.15.1",
-  "ty~=0.0.16",
+  "ruff~=0.15.10",
+  "ty~=0.0.29",
 ]
 
 [project]
 # Dependency constraints must be flexible for WASM compatibility with Micropip.
 dependencies = [
   "bokeh~=3.6",
-  "marimo~=0.22.0",
+  "marimo~=0.23.0",
   "matplotlib~=3.8",
   "numpy~=2.0",
   "scipy~=1.14",
