@@ -74,7 +74,7 @@ lint +paths=".":
 # Wrapper to Nushell.
 [no-exit-message]
 @nu *args:
-  nu {{args}}
+  nu --commands "{{args}}"
 
 # Serve built website.
 serve *flags: build

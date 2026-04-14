@@ -24,6 +24,8 @@
 .tox/
 .ty_cache/
 .venv/
+.vscode/
+.zed/
 /.vendor/
 /build/
 Pipfile
