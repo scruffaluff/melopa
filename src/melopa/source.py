@@ -43,7 +43,7 @@ class SourceChirp(Source):
 
     def name(self) -> str:
         """Find name."""
-        return "impulse"
+        return "chirp"
 
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""

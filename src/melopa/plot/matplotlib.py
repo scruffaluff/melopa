@@ -30,9 +30,10 @@ def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
         y_range += (y.min(), y.max())
 
         axis = axes[0 if overlay else index]
-        axis.semilogx(x, y, color=color, label=label)
+        axis.plot(x, y, color=color, label=label)
         axis.set_title(kwargs.pop("title", None))
         axis.set_xlabel("Frequency (Hz)")
+        axis.set_xscale("log")
         axis.set_xticks(ticks[0])
         axis.set_xticklabels(ticks[1])
         if label:
@@ -49,7 +50,36 @@ def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
 
 def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
     """Plot audio frequency time heatmap with Matplotlib."""
-    raise NotImplementedError
+    ticks = util.spectrum_ticks()
+    x_range, y_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
+
+    figure, axes = subplots(ncols=len(signals))
+    axes[0].set_ylabel("Frequency (Hz)")
+
+    for index, signal in enumerate(signals):
+        x, y, z = util.signal_spectrogram(signal)
+        x_range += (x.min(), x.max())
+
+        axis = axes[index]
+        mesh = axis.pcolormesh(
+            x,
+            y,
+            z,
+            antialiased=True,
+            shading="auto",
+        )
+        axis.set_xlabel("Time (s)")
+        axis.set_yscale("log")
+        axis.set_yticks(ticks[0])
+        axis.set_yticklabels(ticks[1])
+
+    for axis in axes:
+        if x_range.valid():
+            axis.set_xlim(x_range.start, x_range.stop)
+        if y_range.valid():
+            axis.set_ylim(y_range.start, y_range.stop)
+    figure.colorbar(mesh, ax=axes, label="Volume (dB)")
+    return figure
 
 
 def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
@@ -69,9 +99,10 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure
         y_range += (y.min(), y.max())
 
         axis = axes[0 if overlay else index]
-        axis.semilogx(x, y, color=color, label=label)
+        axis.plot(x, y, color=color, label=label)
         axis.set_title(kwargs.pop("title", None))
         axis.set_xlabel("Frequency (Hz)")
+        axis.set_xscale("log")
         axis.set_xticks(ticks[0])
         axis.set_xticklabels(ticks[1])
         if label:

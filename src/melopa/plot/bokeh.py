@@ -3,7 +3,8 @@
 from pathlib import Path
 from typing import Any
 
-from bokeh import io, layouts, plotting
+import numpy
+from bokeh import io, layouts, plotting, transform
 from bokeh.events import DocumentReady, RangesUpdate
 from bokeh.models import (
     ColumnDataSource,
@@ -13,6 +14,7 @@ from bokeh.models import (
     Pane,
     Range1d,
 )
+from bokeh.palettes import Category10
 
 from melopa.plot import util
 
@@ -41,6 +43,8 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
     )
     figure_.add_layout(Legend(click_policy="hide"))
     figure_.toolbar.logo = None
+    figure_.x_range.range_padding = 0  # ty:ignore[unresolved-attribute]
+    figure_.y_range.range_padding = 0  # ty:ignore[unresolved-attribute]
     return figure_
 
 
@@ -107,7 +111,65 @@ def phase(
 
 def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
     """Plot audio frequency time heatmap with Bokeh."""
-    raise NotImplementedError
+    plots = []
+    ticks = util.spectrum_ticks()
+    x_range, y_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
+
+    for signal in signals:
+        x, y, z = util.signal_spectrogram(signal)
+        x_range += (x.min(), x.max())
+        colormap = transform.linear_cmap(
+            field_name="z", palette=Category10[10], low=numpy.min(z), high=numpy.max(z)
+        )
+        source = ColumnDataSource(
+            data={
+                "x": numpy.tile(x, len(y)),
+                "y": numpy.repeat(y, len(x)),
+                "z": z.ravel(),
+            }
+        )
+
+        if plots:
+            plot = figure(
+                x_axis_label="Time (s)",
+                y_axis_type="log",
+                **kwargs,
+            )
+            plot.yaxis.ticker = FixedTicker(ticks=ticks[0])
+            plot.grid.grid_line_width = 0
+            plots.append(plot)
+        else:
+            plot = figure(
+                x_axis_label="Time (s)",
+                y_axis_label="Frequency (Hz)",
+                y_axis_type="log",
+                **kwargs,
+            )
+            plot.yaxis.ticker = FixedTicker(ticks=ticks[0])
+            plot.grid.grid_line_width = 0
+            plots.append(plot)
+
+        plot.rect(
+            x="x",
+            y="y",
+            fill_color=colormap,
+            height=y[1] - y[0],
+            source=source,
+            width=x[1] - x[0],
+        )
+
+    if x_range.valid():
+        plots[0].x_range = Range1d(start=x_range.start, end=x_range.stop)
+    if y_range.valid():
+        plots[0].y_range = Range1d(start=y_range.start, end=y_range.stop)
+    for plot in plots[1:]:
+        plot.x_range = plots[0].x_range
+        plot.y_range = plots[0].y_range
+    return layouts.gridplot(
+        [plots],
+        sizing_mode="stretch_width",
+        toolbar_location="above",
+    )
 
 
 def spectrum(

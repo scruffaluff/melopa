@@ -24,7 +24,7 @@ dev = [
 # Dependency constraints must be flexible for WASM compatibility with Micropip.
 dependencies = [
   "bokeh~=3.6",
-  "marimo~=0.23.0",
+  "marimo~=0.23.1",
   "matplotlib~=3.8",
   "numpy~=2.0",
   "scipy~=1.14",
