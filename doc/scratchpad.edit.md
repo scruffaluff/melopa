@@ -3,10 +3,9 @@ header: |-
   # /// script
   # dependencies = [
   #   "bokeh~=3.6",
-  #   "librosa~=0.11.0",
   #   "matplotlib~=3.8",
   #   "numpy~=2.2",
-  #   "polars~=1.36",
+  #   "polars~=1.24",
   #   "scipy~=1.14",
   # ]
   # requires-python = ">=3.12.0,<4.0.0"
@@ -29,6 +28,7 @@ await __import__("micropip").install(
 import bokeh
 import marimo as mo
 import numpy
+import polars
 import scipy
 
 import melopa
