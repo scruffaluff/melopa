@@ -30,6 +30,7 @@ import marimo as mo
 import numpy
 import polars
 import scipy
+from matplotlib import pyplot
 
 import melopa
 ```

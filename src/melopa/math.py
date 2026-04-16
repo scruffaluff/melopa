@@ -10,5 +10,5 @@ def decibel(signal: NDArray) -> NDArray:
 
 
 def normalize(signal: NDArray) -> NDArray:
-    """Scale signal -1 and +1 range."""
+    """Scale signal to -1 and +1 range."""
     return signal / numpy.abs(signal).max()

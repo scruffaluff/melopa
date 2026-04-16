@@ -4,17 +4,18 @@ from pathlib import Path
 from typing import Any
 
 import numpy
-from bokeh import io, layouts, plotting, transform
+from bokeh import io, layouts, palettes, plotting, transform
 from bokeh.events import DocumentReady, RangesUpdate
 from bokeh.models import (
+    ColorBar,
     ColumnDataSource,
     CustomJS,
     FixedTicker,
     Legend,
+    LinearColorMapper,
     Pane,
     Range1d,
 )
-from bokeh.palettes import Category10
 
 from melopa.plot import util
 
@@ -55,7 +56,7 @@ def phase(
     plots = []
     palette = util.palette_cycle()
     ticks = util.spectrum_ticks()
-    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+    x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     for signal in signals:
         color = signal.pop("color", next(palette))
@@ -112,14 +113,16 @@ def phase(
 def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
     """Plot audio frequency time heatmap with Bokeh."""
     plots = []
+    palette = palettes.viridis(6)
     ticks = util.spectrum_ticks()
-    x_range, y_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
+    x_range, y_range, z_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
 
     for signal in signals:
         x, y, z = util.signal_spectrogram(signal)
         x_range += (x.min(), x.max())
+        z_range += (z.min(), z.max())
         colormap = transform.linear_cmap(
-            field_name="z", palette=Category10[10], low=numpy.min(z), high=numpy.max(z)
+            field_name="z", palette=palette, low=numpy.min(z), high=numpy.max(z)
         )
         source = ColumnDataSource(
             data={
@@ -165,6 +168,17 @@ def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
     for plot in plots[1:]:
         plot.x_range = plots[0].x_range
         plot.y_range = plots[0].y_range
+    plots[-1].add_layout(
+        ColorBar(
+            color_mapper=LinearColorMapper(
+                palette=palette,
+                high=z_range.stop,
+                low=z_range.start,
+            ),
+            title="Volume (dBFS)",
+        ),
+        "right",
+    )
     return layouts.gridplot(
         [plots],
         sizing_mode="stretch_width",
@@ -179,7 +193,7 @@ def spectrum(
     plots = []
     palette = util.palette_cycle()
     ticks = util.spectrum_ticks()
-    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+    x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     for signal in signals:
         color = signal.pop("color", next(palette))
@@ -203,7 +217,7 @@ def spectrum(
             plot = figure(
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
-                y_axis_label="Volume (dB)",
+                y_axis_label="Volume (dBFS)",
                 **kwargs,
             )
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
@@ -239,7 +253,7 @@ def waveform(
     """Plot audio waveform with Bokeh."""
     plots = []
     palette = util.palette_cycle()
-    x_range, y_range = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
+    x_range, y_range, _ = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
 
     for signal in signals:
         color = signal.pop("color", next(palette))

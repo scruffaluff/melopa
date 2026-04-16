@@ -14,9 +14,9 @@ matplotlib.set_loglevel("critical")
 
 
 def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
-    """Plot audio frequency spectrum with Matplotlib."""
+    """Plot audio frequency phase with Matplotlib."""
     palette = util.palette_cycle()
-    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+    x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
     axes = axes[0]
@@ -51,7 +51,7 @@ def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
 def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
     """Plot audio frequency time heatmap with Matplotlib."""
     ticks = util.spectrum_ticks()
-    x_range, y_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
+    x_range, y_range, _ = util.axis_ranges(kwargs, y_range=(20, 20_000))
 
     figure, axes = subplots(ncols=len(signals))
     axes[0].set_ylabel("Frequency (Hz)")
@@ -66,6 +66,7 @@ def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
             y,
             z,
             antialiased=True,
+            cmap="viridis",
             shading="auto",
         )
         axis.set_xlabel("Time (s)")
@@ -78,7 +79,7 @@ def spectrogram(signals: list[dict], **kwargs: Any) -> Figure:
             axis.set_xlim(x_range.start, x_range.stop)
         if y_range.valid():
             axis.set_ylim(y_range.start, y_range.stop)
-    figure.colorbar(mesh, ax=axes, label="Volume (dB)")
+    figure.colorbar(mesh, ax=axes, label="Volume (dBFS)")
     return figure
 
 
@@ -86,11 +87,11 @@ def spectrum(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure
     """Plot audio frequency spectrum with Matplotlib."""
     palette = util.palette_cycle()
     ticks = util.spectrum_ticks()
-    x_range, y_range = util.axis_ranges(kwargs, x_range=(20, 20_000))
+    x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
     axes = axes[0]
-    axes[0].set_ylabel("Volume (dB)")
+    axes[0].set_ylabel("Volume (dBFS)")
 
     for index, signal in enumerate(signals):
         color = signal.pop("color", next(palette))
@@ -125,7 +126,7 @@ def subplots(*args: Any, **kwargs: Any) -> tuple[Figure, Any]:
 def waveform(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     """Plot audio waveform with Matplotlib."""
     palette = util.palette_cycle()
-    x_range, y_range = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
+    x_range, y_range, _ = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
 
     figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
     axes = axes[0]

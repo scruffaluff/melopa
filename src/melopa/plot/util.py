@@ -36,7 +36,8 @@ def axis_ranges(
     kwargs: dict[str, Any],
     x_range: tuple[float, float] | None = None,
     y_range: tuple[float, float] | None = None,
-) -> tuple[Range, Range]:
+    z_range: tuple[float, float] | None = None,
+) -> tuple[Range, Range, Range]:
     """Parse axis ranges from plot keyword arguments."""
     if "x_range" in kwargs:
         x_range_ = Range(kwargs["x_range"][0], kwargs["x_range"][1], True)
@@ -51,7 +52,14 @@ def axis_ranges(
         y_range_ = Range()
     else:
         y_range_ = Range(y_range[0], y_range[1])
-    return x_range_, y_range_
+
+    if "z_range" in kwargs:
+        z_range_ = Range(kwargs["z_range"][0], kwargs["z_range"][1], True)
+    elif z_range is None:
+        z_range_ = Range()
+    else:
+        z_range_ = Range(z_range[0], z_range[1])
+    return x_range_, y_range_, z_range_
 
 
 def palette_cycle() -> itertools.cycle:
@@ -92,7 +100,8 @@ def signal_spectrogram(signal: dict[str, Any]) -> tuple[NDArray, NDArray, NDArra
     )
     bounds = transform.extent(length, center_bins=True)
 
-    z = math.decibel(transform.stft(y_))
+    z_ = transform.stft(y_)
+    z = math.decibel(z_ / numpy.max(z_))
     x = numpy.linspace(bounds[0], bounds[1], num=z.shape[1], dtype=numpy.float32)
     y = numpy.linspace(bounds[2], bounds[3], num=z.shape[0], dtype=numpy.float32)
     return x, y, z.astype(numpy.float32)
@@ -103,8 +112,8 @@ def signal_spectrum(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
     if "f" in signal:
         y = signal.pop("f")
     else:
-        y_ = signal.pop("y")
-        y = math.decibel(numpy.fft.rfft(y_))
+        y_ = numpy.fft.rfft(signal.pop("y"))
+        y = math.decibel(y_ / numpy.max(y_))
 
     if "x" in signal:
         x = signal.pop("x")
