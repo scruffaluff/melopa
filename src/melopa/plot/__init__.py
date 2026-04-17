@@ -78,6 +78,7 @@ def signal(
     signals: list[dict],
     backend: str = "bokeh",
     kind: str = "waveform",
+    normalize: bool = False,
     overlay: bool = True,
     **kwargs: Any,
 ) -> Html:
@@ -88,11 +89,11 @@ def signal(
         case "phase":
             plot = module.phase(signals, overlay, **kwargs)
         case "spectrogram":
-            plot = module.spectrogram(signals, **kwargs)
+            plot = module.spectrogram(signals, normalize, **kwargs)
         case "spectrum":
-            plot = module.spectrum(signals, overlay, **kwargs)
+            plot = module.spectrum(signals, normalize, overlay, **kwargs)
         case "waveform":
-            plot = module.waveform(signals, overlay, **kwargs)
+            plot = module.waveform(signals, normalize, overlay, **kwargs)
         case _:
             message = f"Invalid choice '{kind}' for PlotKind."
             raise ValueError(message)

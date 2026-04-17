@@ -19,9 +19,11 @@ from bokeh.models import (
 
 from melopa.plot import util
 
+PLOT_SIZE = 16_384
+
 
 def add_downsample(
-    plot: plotting.figure, source: ColumnDataSource, size: int = 65_536
+    plot: plotting.figure, source: ColumnDataSource, size: int = PLOT_SIZE
 ) -> None:
     """Add JavaScript downsampling callbacks to Bokeh plot."""
     callback = CustomJS.from_file(
@@ -50,7 +52,7 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
 
 
 def phase(
-    signals: list[dict], overlay: bool = True, size: int = 65_536, **kwargs: Any
+    signals: list[dict], overlay: bool = True, size: int = PLOT_SIZE, **kwargs: Any
 ) -> Pane:
     """Plot audio frequency phase with Bokeh."""
     plots = []
@@ -110,7 +112,7 @@ def phase(
     )
 
 
-def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
+def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> Pane:
     """Plot audio frequency time heatmap with Bokeh."""
     plots = []
     palette = palettes.viridis(6)
@@ -118,7 +120,7 @@ def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
     x_range, y_range, z_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
 
     for signal in signals:
-        x, y, z = util.signal_spectrogram(signal)
+        x, y, z = util.signal_spectrogram(signal, normalize)
         x_range += (x.min(), x.max())
         z_range += (z.min(), z.max())
         colormap = transform.linear_cmap(
@@ -187,7 +189,11 @@ def spectrogram(signals: list[dict], **kwargs: Any) -> Pane:
 
 
 def spectrum(
-    signals: list[dict], overlay: bool = True, size: int = 65_536, **kwargs: Any
+    signals: list[dict],
+    normalize: bool = False,
+    overlay: bool = True,
+    size: int = PLOT_SIZE,
+    **kwargs: Any,
 ) -> Pane:
     """Plot audio frequency spectrum with Bokeh."""
     plots = []
@@ -198,7 +204,7 @@ def spectrum(
     for signal in signals:
         color = signal.pop("color", next(palette))
         method = signal.pop("method", "line")
-        x, y = util.signal_spectrum(signal)
+        x, y = util.signal_spectrum(signal, normalize)
         y_range += (y.min(), y.max())
         source = ColumnDataSource(data={"x": x, "y": y})
 
@@ -248,7 +254,11 @@ def spectrum(
 
 
 def waveform(
-    signals: list[dict], overlay: bool = True, size: int = 65_536, **kwargs: Any
+    signals: list[dict],
+    normalize: bool = False,
+    overlay: bool = True,
+    size: int = PLOT_SIZE,
+    **kwargs: Any,
 ) -> Pane:
     """Plot audio waveform with Bokeh."""
     plots = []
@@ -258,7 +268,7 @@ def waveform(
     for signal in signals:
         color = signal.pop("color", next(palette))
         method = signal.pop("method", "line")
-        x, y = util.signal_waveform(signal)
+        x, y = util.signal_waveform(signal, normalize)
         x_range += (x[0], x[-1])
         y_range += (y.min(), y.max())
         source = ColumnDataSource(data={"x": x, "y": y})

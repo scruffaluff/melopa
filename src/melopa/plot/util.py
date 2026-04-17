@@ -85,7 +85,9 @@ def signal_phase(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
     return x.astype(numpy.float32), y.astype(numpy.float32)
 
 
-def signal_spectrogram(signal: dict[str, Any]) -> tuple[NDArray, NDArray, NDArray]:
+def signal_spectrogram(
+    signal: dict[str, Any], normalize: bool = False
+) -> tuple[NDArray, NDArray, NDArray]:
     """Extract time binned frequency spectrum from signal dictionary."""
     y_ = signal.pop("y")
     rate = signal.pop("rate")
@@ -100,21 +102,19 @@ def signal_spectrogram(signal: dict[str, Any]) -> tuple[NDArray, NDArray, NDArra
     )
     bounds = transform.extent(length, center_bins=True)
 
-    z_ = transform.stft(y_)
-    z = math.decibel(z_ / numpy.max(z_))
+    z = transform.stft(y_)
+    if normalize:
+        z = math.normalize(z)
     x = numpy.linspace(bounds[0], bounds[1], num=z.shape[1], dtype=numpy.float32)
     y = numpy.linspace(bounds[2], bounds[3], num=z.shape[0], dtype=numpy.float32)
-    return x, y, z.astype(numpy.float32)
+    return x, y, math.decibel(z).astype(numpy.float32)
 
 
-def signal_spectrum(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
+def signal_spectrum(
+    signal: dict[str, Any], normalize: bool = False
+) -> tuple[NDArray, NDArray]:
     """Extract frequency spectrum from signal dictionary."""
-    if "f" in signal:
-        y = signal.pop("f")
-    else:
-        y_ = numpy.fft.rfft(signal.pop("y"))
-        y = math.decibel(y_ / numpy.max(y_))
-
+    y = signal.pop("f") if "f" in signal else numpy.fft.rfft(signal.pop("y"))
     if "x" in signal:
         x = signal.pop("x")
     else:
@@ -122,10 +122,14 @@ def signal_spectrum(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
         rate = signal.pop("rate")
         x = numpy.fft.rfftfreq(length, 1 / rate)
 
-    return x.astype(numpy.float32), y.astype(numpy.float32)
+    if normalize:
+        y = math.normalize(y)
+    return x.astype(numpy.float32), math.decibel(y).astype(numpy.float32)
 
 
-def signal_waveform(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
+def signal_waveform(
+    signal: dict[str, Any], normalize: bool = False
+) -> tuple[NDArray, NDArray]:
     """Extract waveform from signal dictionary."""
     y = signal.pop("y")
     if "x" in signal:
@@ -134,6 +138,8 @@ def signal_waveform(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
         rate = signal.pop("rate")
         x = numpy.linspace(0, len(y) / rate, len(y))
 
+    if normalize:
+        y = math.normalize(y)
     return x.astype(numpy.float32), y.astype(numpy.float32)
 
 
