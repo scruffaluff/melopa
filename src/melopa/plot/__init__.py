@@ -46,21 +46,23 @@ class Config(NamedTuple):
     overlay: bool = True
 
 
-def ui() -> marimo.ui.batch:
+def ui(
+    backend: str = "Bokeh", kind: str = "Waveform", overlay: bool = True
+) -> marimo.ui.batch:
     """Marimo element to select a signal plot settings."""
-    backend = marimo.ui.dropdown(
+    backend_ = marimo.ui.dropdown(
         Backend.options(),
         allow_select_none=False,
         label="Backend",
-        value="Bokeh",
+        value=backend,
     )
-    kind = marimo.ui.dropdown(
+    kind_ = marimo.ui.dropdown(
         Kind.options(),
         allow_select_none=False,
         label="Type",
-        value="Waveform",
+        value=kind,
     )
-    overlay = marimo.ui.switch(label="Overlay", value=True)
+    overlay_ = marimo.ui.switch(label="Overlay", value=overlay)
     return Html(
         """
 <div style="display: flex; flex-direction: row; gap: 0.5rem;" >
@@ -68,9 +70,9 @@ def ui() -> marimo.ui.batch:
 </div>
         """.strip()
     ).batch(
-        backend=backend,  # ty:ignore[invalid-argument-type]
-        kind=kind,  # ty:ignore[invalid-argument-type]
-        overlay=overlay,  # ty:ignore[invalid-argument-type]
+        backend=backend_,  # ty:ignore[invalid-argument-type]
+        kind=kind_,  # ty:ignore[invalid-argument-type]
+        overlay=overlay_,  # ty:ignore[invalid-argument-type]
     )
 
 

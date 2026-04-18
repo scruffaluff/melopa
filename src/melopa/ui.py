@@ -1,7 +1,9 @@
 """Custom Marimo UI components."""
 
+import inspect
 import traceback
 from collections.abc import Callable, Iterable
+from types import FunctionType
 from typing import Any, cast
 
 import marimo
@@ -34,8 +36,10 @@ def difference_matrix(
     return marimo.ui.matrix(matrix, debounce=True, row_labels=["b", "a"])
 
 
-def editor(code: str) -> Html:
+def editor(code: str | FunctionType) -> Html:
     """Create a Marimo code editor."""
+    if isinstance(code, FunctionType):
+        code = inspect.getsource(code)
     editor_ = marimo.ui.code_editor(code.strip(), debounce=True)
     return Html("<div>{editor}</div>").batch(editor=editor_)  # ty:ignore[invalid-argument-type]
 

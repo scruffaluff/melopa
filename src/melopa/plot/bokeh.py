@@ -10,6 +10,7 @@ from bokeh.models import (
     ColorBar,
     ColumnDataSource,
     CustomJS,
+    DataRange1d,
     FixedTicker,
     Legend,
     LinearColorMapper,
@@ -37,17 +38,20 @@ def add_downsample(
 
 def figure(*args: Any, **kwargs: Any) -> plotting.figure:
     """Melopa wrapper for Bokeh figures."""
+    x_range = kwargs.pop("x_range", DataRange1d(range_padding=0))
+    y_range = kwargs.pop("y_range", DataRange1d(range_padding=0))
+
     figure_ = plotting.figure(
         *args,
         output_backend="webgl",
         sizing_mode="stretch_width",
         tools="fullscreen,pan,box_zoom,wheel_zoom,undo,redo,reset,save",
+        x_range=x_range,
+        y_range=y_range,
         **kwargs,
     )
     figure_.add_layout(Legend(click_policy="hide"))
     figure_.toolbar.logo = None
-    figure_.x_range.range_padding = 0  # ty:ignore[unresolved-attribute]
-    figure_.y_range.range_padding = 0  # ty:ignore[unresolved-attribute]
     return figure_
 
 

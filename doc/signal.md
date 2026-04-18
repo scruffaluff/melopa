@@ -142,7 +142,7 @@ code = """
 def dft(x: NDArray) -> NDArray:
     N = len(x)
     w = 2 * numpy.pi / N
-    size = math.floor(N / 2 + 1)
+    size = N // 2 + 1
     X = numpy.zeros(size, dtype=numpy.complex128)
     for k in range(size):
         X[k] = numpy.sum(x * numpy.exp(-1j * w * k * numpy.arange(N)))

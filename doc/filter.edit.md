@@ -118,18 +118,18 @@ de_matrix
 de_freq, de_amp = scipy.signal.freqz(
     de_matrix.value[0], de_matrix.value[1], 1000, fs=de_rate
 )
-de_decibels = melopa.math.decibel(de_amp)
 melopa.plot.signal(
-    [{"x": de_freq, "f": de_decibels}],
+    [{"x": de_freq, "f": de_amp}],
     backend="matplotlib",
     kind="spectrum",
+    normalize=True,
     y_range=(-50, 0),
 )
 ```
 
 ## Finite Response
 
-An finite impulse response (FIR) filter is an LTI filter whose output does not
+A finite impulse response (FIR) filter is an LTI filter whose output does not
 depend on previous outputs. Thus, its Z-transform has no denominator polynomial
 with form $H(z) = \sum_{n=0}^{N} b_n z^{-n}$ and its difference equation has
 form $y[k] = \sum_{n=0}^{N} b_n x[k-n]$.
@@ -151,29 +151,29 @@ The following interface provides controls for a Butterworth low-pass filter,
 which attenuates high frequencies from a signal.
 
 ```python {.marimo}
-bw_cutoff_ui = mo.ui.slider(
+bwf_cutoff_ui = mo.ui.slider(
     steps=(440 * numpy.logspace(-4, 5, 100, base=2)).round(2),
     label="Cutoff",
     show_value=True,
 )
-bw_order_ui = mo.ui.slider(1, 10, 1, label="Order", show_value=True, value=4)
-mo.hstack([bw_cutoff_ui, bw_order_ui], justify="start")
+bwf_order_ui = mo.ui.slider(1, 10, 1, label="Order", show_value=True, value=4)
+mo.hstack([bwf_cutoff_ui, bwf_order_ui], justify="start")
 ```
 
 ```python {.marimo}
-bw_rate = 40_000
-bw_b, bw_a = scipy.signal.butter(
-    bw_order_ui.value, bw_cutoff_ui.value, "lowpass", fs=rate
+bwf_rate = 40_000
+bwf_b, bwf_a = scipy.signal.butter(
+    bwf_order_ui.value, bwf_cutoff_ui.value, "lowpass", fs=bwf_rate
 )
-bw_freq, bw_amp = scipy.signal.freqz(bw_b, bw_a, 1_000, fs=bw_rate)
-bw_decibels = melopa.math.decibel(bw_amp)
+bwf_freq, bwf_amp = scipy.signal.freqz(bwf_b, bwf_a, 1_000, fs=bwf_rate)
 ```
 
 ```python {.marimo}
 melopa.plot.signal(
-    [{"x": bw_freq, "f": bw_decibels}],
+    [{"x": bwf_freq, "f": bwf_amp}],
     backend="matplotlib",
     kind="spectrum",
+    normalize=True,
     y_range=(-100, 0),
 )
 ```
@@ -181,39 +181,39 @@ melopa.plot.signal(
 We can apply the low-pass filter to any sound and visualized its affects below.
 
 ```python {.marimo}
-signal, rate = SourceFile("talitha5-cafe_ambience.wav").read()
-sos = scipy.signal.butter(10, 1000, "lowpass", fs=rate, output="sos")
-processed = scipy.signal.sosfilt(sos, signal)
+bw_signal, bw_rate = SourceFile("talitha5-cafe_ambience.wav").read()
+bw_sos = scipy.signal.butter(10, 1000, "lowpass", fs=bw_rate, output="sos")
+bw_processed = scipy.signal.sosfilt(bw_sos, bw_signal)
 ```
 
 ```python {.marimo}
-plot_ui = melopa.plot.ui()
-mo.right(plot_ui)
+bw_plot_ui = melopa.plot.ui()
+mo.right(bw_plot_ui)
 ```
 
 ```python {.marimo}
 melopa.plot.signal(
     [
-        {"rate": rate, "y": signal, "legend_label": "original"},
-        {"rate": rate, "y": processed, "legend_label": "processed"},
+        {"rate": bw_rate, "y": bw_signal, "legend_label": "original"},
+        {"rate": bw_rate, "y": bw_processed, "legend_label": "processed"},
     ],
-    **plot_ui.value,
+    **bw_plot_ui.value,
 )
 ```
 
 ```python {.marimo}
 melopa.ui.audio_list([
-    {"signal": signal, "rate": rate, "name": "Original"},
-    {"signal": processed, "rate": rate, "name": "Processed"},
+    {"signal": bw_signal, "rate": bw_rate, "name": "Original"},
+    {"signal": bw_processed, "rate": bw_rate, "name": "Processed"},
 ])
 ```
 
 ## Biquad
 
 A biquad filter is a second order recursive filter containing two poles and two
-zeros. Thus, its transfer function is a ratio quadratic functions.
+zeros. Thus, its transfer function is a ratio of quadratic functions.
 
-```python {.marimo unparsable="true"}
+```python {.marimo}
 mo.mermaid("""
 ---
 config:
@@ -224,4 +224,34 @@ stateDiagram
     direction LR
     x[n] --> y[n]: T{*}
 """)
+```
+
+## Allpass
+
+```python {.marimo}
+ap_a = 0.1
+ap_signal, ap_rate = SourceFile("dwsd-kick_laid.wav").read()
+ap_processed = scipy.signal.lfilter([1 - ap_a], [1, ap_a], ap_signal)
+```
+
+```python {.marimo}
+ap_plot_ui = melopa.plot.ui(kind="Phase")
+mo.right(ap_plot_ui)
+```
+
+```python {.marimo}
+melopa.plot.signal(
+    [
+        {"rate": ap_rate, "y": ap_signal, "legend_label": "original"},
+        {"rate": ap_rate, "y": ap_processed, "legend_label": "processed"},
+    ],
+    **ap_plot_ui.value,
+)
+```
+
+```python {.marimo}
+melopa.ui.audio_list([
+    {"signal": ap_signal, "rate": ap_rate, "name": "Original"},
+    {"signal": ap_processed, "rate": ap_rate, "name": "Processed"},
+])
 ```

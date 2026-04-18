@@ -36,27 +36,24 @@ import melopa
 
 ## Resample
 
-Resampling changes the sampling frequency of an audio signal. One method to
-resample a signal is by trimming or zero-padding its Fourier transform. Playing
-a resampled signal with the original sampling frequency changes the speed of the
-signal.
+Resampling in the process of changing the sample rate of an existing signal. We
+can resample in time domain by periodically removing or insert interpolated
+samples and then applying lowpass filters to prevent aliasing. However, it more
+trivial to resample in the frequency domain. By removing the upper frequencies
+of the Fourier transform we decrease the sample rate. Similarly by zero padding
+after the upper frequencies, we increase the sampling rate. Playing back the
+resample signal at the original sample rate will change the speed of the signal
+as shown below.
 
 ```python {.marimo}
-code = f"""
-def resample(signal: NDArray, ratio: float) -> NDArray:
-    size_in = len(signal)
-    size_out = int(ratio * size_in + 0.5)
-    bins = min(size_in, size_out) // 2 + 1
-    freq = numpy.fft.rfft(signal)[:bins]
-    return numpy.fft.irfft(size_out * freq / size_in, n=size_out)
-"""
-```
-
-```python {.marimo}
-editor_ui = melopa.ui.editor(code)
+editor_ui = melopa.ui.editor(melopa.code.resample)
 signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
 ratio_ui = mo.ui.slider(
-    0.1, 6, 0.1, debounce=True, label="Ratio", show_value=True, value=1
+    debounce=True,
+    label="Ratio",
+    show_value=True,
+    steps=numpy.round(numpy.logspace(-1, 1, 17), 2),
+    value=1,
 )
 plot_ui = melopa.plot.ui()
 
