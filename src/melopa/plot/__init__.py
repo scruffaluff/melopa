@@ -7,9 +7,9 @@ import marimo
 from marimo import Html
 
 from melopa.plot import bokeh, matplotlib
-from melopa.plot.bokeh import figure
+from melopa.plot.bokeh import figure, gridplot
 
-__all__ = ["bokeh", "figure", "matplotlib"]
+__all__ = ["bokeh", "figure", "gridplot", "matplotlib"]
 __version__ = "0.1.0"
 
 

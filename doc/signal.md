@@ -38,7 +38,7 @@ import melopa
 A digital audio signal is a representation of sound as a sequence of numbers
 denoted as $x[n]$. Digital audio signals can be generated from continuous analog
 signals by discretely recording them at a sampling frequency $F$. We can view
-the comparison between for analog and digital for the sine and impulse signals
+a comparison between analog and digital signals in the sine and impulse plots
 below.
 
 ```python {.marimo}
@@ -54,37 +54,34 @@ def _():
     delta_d = numpy.zeros(len(time_d))
     delta_d[16] = 1
 
-    return bokeh.layouts.row(
-        [
-            melopa.plot.signal(
-                [
-                    {"x": time_c, "y": sine_c, "legend_label": "Continuous"},
-                    {
-                        "x": time_d,
-                        "y": sine_d,
-                        "legend_label": "Discrete",
-                        "method": "scatter",
-                    },
-                ],
-                title="Sine",
-                y_range=(-1.1, 1.1),
-            ),
-            melopa.plot.signal(
-                [
-                    {"x": time_c, "y": delta_c, "legend_label": "Continuous"},
-                    {
-                        "x": time_d,
-                        "y": delta_d,
-                        "legend_label": "Discrete",
-                        "method": "scatter",
-                    },
-                ],
-                title="Impulse",
-                y_range=(-1.1, 1.1),
-            ),
-        ],
-        sizing_mode="stretch_width",
-    )
+    return melopa.plot.gridplot([
+        melopa.plot.signal(
+            [
+                {"x": time_c, "y": sine_c, "legend_label": "Continuous"},
+                {
+                    "x": time_d,
+                    "y": sine_d,
+                    "legend_label": "Discrete",
+                    "method": "scatter",
+                },
+            ],
+            title="Sine",
+            y_range=(-1.1, 1.1),
+        ),
+        melopa.plot.signal(
+            [
+                {"x": time_c, "y": delta_c, "legend_label": "Continuous"},
+                {
+                    "x": time_d,
+                    "y": delta_d,
+                    "legend_label": "Discrete",
+                    "method": "scatter",
+                },
+            ],
+            title="Impulse",
+            y_range=(-1.1, 1.1),
+        ),
+    ])
 
 
 _()
@@ -93,7 +90,7 @@ _()
 ## System
 
 A digital system $T$ is a function that maps an input signal $x[n]$ to an output
-signal $y[n]$ $y[n] = T\{x[n]\}$ as shown in the block diagram below.
+signal $y[n]$. The system equation is conventionally written as $y[n] = T(x[n])$ and described in a block diagram as follows.
 
 ```python {.marimo}
 mo.mermaid("""
@@ -108,9 +105,9 @@ stateDiagram
 """)
 ```
 
-The class of linear and time invariant (LTI) systems are often used in audio
+The class of linear and time invariant (LTI) systems are often used in digital audio
 processing for their properties. Each LTI system $T$ in this class can be
-rewritten as a convolution of its impulse response $h[n]$, i.e. its output to
+written as a convolution of its impulse response $h[n]$, i.e. its output to
 the impulse signal, as follows.
 
 $$ T(x[n]) = \sum_{k=-\infty}^{\infty} x[n] h[n-k] = x[n] * h[n] $$
@@ -120,13 +117,10 @@ $$ T(x[n]) = \sum_{k=-\infty}^{\infty} x[n] h[n-k] = x[n] * h[n] $$
 A transform maps signals from one domain to another domain. One of the most
 useful transforms is the
 [discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform),
-which converts a discrete signals from the time domain to the frequency domain.
+which converts a discrete signal from the time domain to the frequency domain.
 
-Let's consider a signal $x[n]$ of length $N$ and sampling period $T$. The signal
-has sampling frequency $\frac{1}{T}$ and angular frequency $a =
-\frac{2\pi}{NT}$.
-The following equations describe the relationships between signal $x[n]$ and its
-Fourier transform $X[k]$.
+For a signal $x[n]$ of length $N$, the following equations describe the
+relationships between $x[n]$ and its Fourier transform $X[k]$.
 
 $$
 X[k] = \sum_{n=0}^{N-1} x[n] e^{-iakn}
@@ -134,34 +128,21 @@ X[k] = \sum_{n=0}^{N-1} x[n] e^{-iakn}
 x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] e^{iakn}
 $$
 
-To demonstrate the transform, we'll implement it in code as the `dtf` function
+To demonstrate the transform, we'll implement it in code as the `dft` function
 below and plot it for sine waves.
 
 ```python {.marimo}
-code = """
-def dft(x: NDArray) -> NDArray:
-    N = len(x)
-    w = 2 * numpy.pi / N
-    size = N // 2 + 1
-    X = numpy.zeros(size, dtype=numpy.complex128)
-    for k in range(size):
-        X[k] = numpy.sum(x * numpy.exp(-1j * w * k * numpy.arange(N)))
-    return X
-"""
-```
-
-```python {.marimo}
-editor_ui = melopa.ui.editor(code)
-freq_ui = mo.ui.slider(0, 100, 1, label="Frequency", show_value=True, value=2)
-rate_ui = mo.ui.slider(0, 100, 1, label="Rate", show_value=True, value=50)
-mo.vstack([mo.hstack([freq_ui, rate_ui], gap=2, justify="start"), editor_ui])
+editor_ui = melopa.ui.editor(melopa.code.dft)
+freq_ui = mo.ui.slider(0, 20, 1, label="Frequency", show_value=True, value=2)
+mo.vstack([freq_ui, editor_ui])
 ```
 
 ```python {.marimo}
 exec(editor_ui.value["editor"])
-time = numpy.linspace(0, 1, rate_ui.value)
-waveform = numpy.sin(2 * numpy.pi * freq_ui.value * rate_ui.value * time)
-freq = numpy.fft.rfftfreq(len(time), 1 / rate_ui.value)
+rate = 1_000
+time = numpy.linspace(0, 1, rate)
+waveform = numpy.sin(2 * numpy.pi * freq_ui.value * rate * time)
+freq = numpy.fft.rfftfreq(len(time), 1 / rate)
 spectrum, output = melopa.ui.run(lambda: dft(waveform))
 output
 ```
@@ -173,8 +154,8 @@ spectrum_plot = melopa.plot.figure(
     x_axis_label="Frequency (Hz)",
     y_axis_label="Amplitude",
 )
-spectrum_plot.line(x=freq, y=numpy.abs(spectrum))
-bokeh.layouts.row([waveform_plot, spectrum_plot], sizing_mode="stretch_width")
+spectrum_plot.line(x=freq[:20], y=numpy.abs(spectrum)[:20])
+melopa.plot.gridplot([waveform_plot, spectrum_plot])
 ```
 
 The Fourier transform has the convolution property that $y[n] = x[n] * h[n]$ if
@@ -205,8 +186,6 @@ $$ H(z) = \frac{\sum_{n=0}^{N} b_k z^{-n}}{\sum_{m=0}^{N} a_k z^{-m}} $$
 The zeros of the system are the roots of the numerator and the poles of the
 system are the roots of the denominator.
 
-<a href="/filter.html">Filters</a>
-
 ## Short Time Fourier Transform
 
 The discrete Fourier transform decomposes the entire signal into frequency
@@ -225,6 +204,8 @@ X[m, k] = \sum_{n=0}^{N-1} x[n] w[n-m] e^{-iakn}
 \newline
 x[n] = \frac{1}{w[n-m] * N} \sum_{k=0}^{N-1} X[m, k] e^{iakn}
 $$
+
+<a href="/filter.html">Filters</a>
 
 ## References
 

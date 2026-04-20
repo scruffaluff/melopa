@@ -1,9 +1,19 @@
 """Source code for notebook examples."""
 
-# ruff: noqa: D103
+# ruff: noqa: D103, N806
 
 import numpy
 from numpy.typing import NDArray
+
+
+def dft(x: NDArray) -> NDArray:
+    N = len(x)
+    a = 2 * numpy.pi / N
+    size = N // 2 + 1
+    X = numpy.zeros(size, dtype=numpy.complex128)
+    for k in range(size):
+        X[k] = numpy.sum(x * numpy.exp(-1j * a * k * numpy.arange(N)))
+    return X
 
 
 def resample(signal: NDArray, ratio: float) -> NDArray:

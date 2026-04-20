@@ -16,6 +16,7 @@ from bokeh.models import (
     LinearColorMapper,
     Pane,
     Range1d,
+    UIElement,
 )
 
 from melopa.plot import util
@@ -45,6 +46,7 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
         *args,
         output_backend="webgl",
         sizing_mode="stretch_width",
+        toolbar_location="above",
         tools="fullscreen,pan,box_zoom,wheel_zoom,undo,redo,reset,save",
         x_range=x_range,
         y_range=y_range,
@@ -53,6 +55,15 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
     figure_.add_layout(Legend(click_policy="hide"))
     figure_.toolbar.logo = None
     return figure_
+
+
+def gridplot(plots: list[UIElement | None]) -> Pane:
+    """Melopa wrapper for Bokeh gridplot."""
+    return layouts.gridplot(
+        [plots],
+        sizing_mode="stretch_width",
+        toolbar_location="above",
+    )
 
 
 def phase(
@@ -109,6 +120,9 @@ def phase(
     for plot in plots[1:]:
         plot.x_range = plots[0].x_range
         plot.y_range = plots[0].y_range
+
+    if len(plots) == 1:
+        return plots[0]
     return layouts.gridplot(
         [plots],
         sizing_mode="stretch_width",
@@ -185,6 +199,9 @@ def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> 
         ),
         "right",
     )
+
+    if len(plots) == 1:
+        return plots[0]
     return layouts.gridplot(
         [plots],
         sizing_mode="stretch_width",
@@ -250,6 +267,9 @@ def spectrum(
     for plot in plots[1:]:
         plot.x_range = plots[0].x_range
         plot.y_range = plots[0].y_range
+
+    if len(plots) == 1:
+        return plots[0]
     return layouts.gridplot(
         [plots],
         sizing_mode="stretch_width",
@@ -311,6 +331,9 @@ def waveform(
     for plot in plots[1:]:
         plot.x_range = plots[0].x_range
         plot.y_range = plots[0].y_range
+
+    if len(plots) == 1:
+        return plots[0]
     return layouts.gridplot(
         [plots],
         sizing_mode="stretch_width",

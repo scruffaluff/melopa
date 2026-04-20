@@ -37,12 +37,12 @@ import melopa
 ## Resample
 
 Resampling in the process of changing the sample rate of an existing signal. We
-can resample in time domain by periodically removing or insert interpolated
+can resample in the time domain by periodically removing or inserting interpolated
 samples and then applying lowpass filters to prevent aliasing. However, it more
 trivial to resample in the frequency domain. By removing the upper frequencies
 of the Fourier transform we decrease the sample rate. Similarly by zero padding
 after the upper frequencies, we increase the sampling rate. Playing back the
-resample signal at the original sample rate will change the speed of the signal
+resampled signal at the original sample rate will change the speed of the signal
 as shown below.
 
 ```python {.marimo}
