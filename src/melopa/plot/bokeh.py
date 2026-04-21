@@ -195,7 +195,7 @@ def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> 
                 high=z_range.stop,
                 low=z_range.start,
             ),
-            title="Volume (dBFS)",
+            title="Volume (dB)",
         ),
         "right",
     )
@@ -244,7 +244,7 @@ def spectrum(
             plot = figure(
                 x_axis_label="Frequency (Hz)",
                 x_axis_type="log",
-                y_axis_label="Volume (dBFS)",
+                y_axis_label="Volume (dB)",
                 **kwargs,
             )
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])

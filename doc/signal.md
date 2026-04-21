@@ -205,7 +205,11 @@ X[m, k] = \sum_{n=0}^{N-1} x[n] w[n-m] e^{-iakn}
 x[n] = \frac{1}{w[n-m] * N} \sum_{k=0}^{N-1} X[m, k] e^{iakn}
 $$
 
-<a href="/filter.html">Filters</a>
+## Bilinear Transform
+
+## Next
+
+Follow the next notebook <a href="/melopa/filter.html">Filters</a>.
 
 ## References
 

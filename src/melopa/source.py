@@ -18,6 +18,8 @@ from scipy.io import wavfile
 
 from melopa import math, util
 
+random = numpy.random.default_rng()
+
 
 class Source(ABC):
     """Generic interface for loading audio signals."""
@@ -67,11 +69,12 @@ class SourceFile(Source):
             "esperar-chicken_imitation.wav",
             "gowers-amen_break.wav",
             "hallkev-timpani_roll.wav",
-            "karolist-acoustic_kick.wav",
             "mefrancis13-crowded_room.wav",
+            "realwisut1993-snare_midlow.wav",
             "talitha5-cafe_ambience.wav",
             "templeofhades-scratch_sample.wav",
             "unfa-fail_jingle.wav",
+            "zuluonedrop-drum_fill.wav",
         ]
 
     def name(self) -> str:
@@ -169,6 +172,50 @@ class SourceNone(Source):
         return numpy.zeros(int(self._time * self._rate)), self._rate
 
 
+class SourcePinkNoise(Source):
+    """Generate pink noise signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 1.0) -> None:
+        """Create a SourcePinkNoise instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "pink_noise"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        length = int(self._rate * self._time)
+        white_noise = random.uniform(-1.0, 1.0, length)
+        freq = numpy.fft.rfftfreq(length, d=1 / self._rate)
+
+        pink_freq = numpy.fft.rfft(white_noise)
+        pink_freq[1:] /= numpy.sqrt(freq[1:])
+        pink_noise = numpy.fft.irfft(pink_freq)
+        return math.normalize(pink_noise), self._rate
+
+
+class SourceRectangle(Source):
+    """Generate rectangle signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 1.0) -> None:
+        """Create a SourceRectangle instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "rectangle"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        length = int(self._rate * self._time)
+        wave = numpy.zeros(length)
+        wave[length // 4 : 3 * length // 4] = 1.0
+        return wave, self._rate
+
+
 class SourceSawtooth(Source):
     """Generate sawtooth signal."""
 
@@ -188,6 +235,24 @@ class SourceSawtooth(Source):
         """Load audio signal."""
         wave = numpy.linspace(-1, 1, int(self._rate / self._freq))
         return numpy.concatenate(int(self._freq * self._time) * (wave,)), self._rate
+
+
+class SourceSilence(Source):
+    """Generate slient signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 1.0) -> None:
+        """Create a SourceSilence instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "silence"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        length = int(self._rate * self._time)
+        return numpy.zeros(length), self._rate
 
 
 class SourceSine(Source):
@@ -234,6 +299,44 @@ class SourceSquare(Source):
         return numpy.concatenate(int(self._freq * self._time) * (wave,)), self._rate
 
 
+class SourceUnitStep(Source):
+    """Generate unit step signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 1.0) -> None:
+        """Create a SourceUnitStep instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "unit_step"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        length = int(self._rate * self._time)
+        wave = numpy.zeros(length)
+        wave[length // 2 : length] = 1.0
+        return wave, self._rate
+
+
+class SourceWhiteNoise(Source):
+    """Generate white noise signal."""
+
+    def __init__(self, rate: int = 48_000, time: float = 1.0) -> None:
+        """Create a SourceWhiteNoise instance."""
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "white_noise"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        length = int(self._rate * self._time)
+        return random.uniform(-1.0, 1.0, length), self._rate
+
+
 def select(name: str) -> Source:
     """Find source corresponding to given name."""
     class_ = {
@@ -241,9 +344,14 @@ def select(name: str) -> Source:
         "impulse": SourceImpulse,
         "linear": SourceLinear,
         "none": SourceNone,
+        "pink_noise": SourcePinkNoise,
+        "rectangle": SourceRectangle,
         "sawtooth": SourceSawtooth,
+        "silence": SourceSilence,
         "sine": SourceSine,
         "square": SourceSquare,
+        "unit_step": SourceUnitStep,
+        "white_noise": SourceWhiteNoise,
     }.get(name)
     if class_ is None:
         return SourceFile(name)
@@ -252,7 +360,20 @@ def select(name: str) -> Source:
 
 def synths() -> list[str]:
     """Find list of synth source names."""
-    return ["chirp", "impulse", "linear", "none", "sawtooth", "sine", "square"]
+    return [
+        "chirp",
+        "impulse",
+        "linear",
+        "none",
+        "pink_noise",
+        "rectangle",
+        "sawtooth",
+        "silence",
+        "sine",
+        "square",
+        "unit_step",
+        "white_noise",
+    ]
 
 
 def ui(default: str) -> tuple[State[Source], Html]:

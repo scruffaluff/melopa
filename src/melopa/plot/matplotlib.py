@@ -79,7 +79,7 @@ def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> 
             axis.set_xlim(x_range.start, x_range.stop)
         if y_range.valid():
             axis.set_ylim(y_range.start, y_range.stop)
-    figure.colorbar(mesh, ax=axes, label="Volume (dBFS)")
+    figure.colorbar(mesh, ax=axes, label="Volume (dB)")
     return figure
 
 
@@ -93,7 +93,7 @@ def spectrum(
 
     figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
     axes = axes[0]
-    axes[0].set_ylabel("Volume (dBFS)")
+    axes[0].set_ylabel("Volume (dB)")
 
     for index, signal in enumerate(signals):
         color = signal.pop("color", next(palette))

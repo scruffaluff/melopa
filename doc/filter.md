@@ -37,7 +37,7 @@ from melopa.source import SourceFile
 
 Audio filters are digital systems that modify features of sound. One common
 example is a low-pass filter which removes a band of lower frequencies. A very
-basic low-pass filter is a moving average system which is implemented below.
+basic low-pass filter is a moving average system as implemented below.
 
 ```python {.marimo}
 maf_editor_ui = melopa.ui.editor("""
@@ -90,20 +90,16 @@ melopa.ui.audio_list([
 ])
 ```
 
-The commonest class of audio filters are linear and time invariant (LTI)
-filters. Linear filter, while time invariant filters are.
-
 ## Difference Equation
 
-It is often useful to analyze the class of LTI filters that are also casual,
-i.e. This filter is class is useful since their Z-transform can be expressed as
-a ratio of polynomials.
+The class of LTI filters, that are also casual, are commonly used since their
+Z-transform can be expressed as a ratio of polynomials.
 
 $$ H(z) = \frac{\sum_{n=0}^{N} b_n z^{-n}}{\sum_{m=0}^{M} a_m z^{-m}} $$
 
-For analytical convenience, these notebook assume that `a_0 = 1`. When
-Z-transform is a ratio of polynomials, its system can be expressed by the
-following difference equation.
+For analytical convenience, it is conventional to scale the polynomials such
+that `a_0 = 1`. When a Z-transform is a ratio of polynomials, its system can be
+expressed by the following difference equation.
 
 $$ y[k] = -\sum_{m=1}^{M} a_m y[k-m] + \sum_{n=0}^{N} b_n x[k-n] $$
 
