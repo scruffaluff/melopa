@@ -53,6 +53,26 @@ class SourceChirp(Source):
         return scipy.signal.chirp(time, f0=80, f1=4000, t1=self._time), self._rate
 
 
+class SourceConstant(Source):
+    """Generate constant signal."""
+
+    def __init__(
+        self, value: float = 0.0, rate: int = 48_000, time: float = 2.0
+    ) -> None:
+        """Create a SourceConstant instance."""
+        self._value = value
+        self._rate = rate
+        self._time = time
+
+    def name(self) -> str:
+        """Find name."""
+        return "constant"
+
+    def read(self) -> tuple[NDArray, int]:
+        """Load audio signal."""
+        return self._value + numpy.zeros(int(self._time * self._rate)), self._rate
+
+
 class SourceFile(Source):
     """Read signals from a file."""
 
@@ -155,23 +175,6 @@ class SourceLinear(Source):
         return numpy.linspace(-1, 1, int(self._time * self._rate)), self._rate
 
 
-class SourceNone(Source):
-    """Generate silent signal."""
-
-    def __init__(self, rate: int = 48_000, time: float = 2.0) -> None:
-        """Create a SourceNone instance."""
-        self._rate = rate
-        self._time = time
-
-    def name(self) -> str:
-        """Find name."""
-        return "none"
-
-    def read(self) -> tuple[NDArray, int]:
-        """Load audio signal."""
-        return numpy.zeros(int(self._time * self._rate)), self._rate
-
-
 class SourcePinkNoise(Source):
     """Generate pink noise signal."""
 
@@ -237,22 +240,21 @@ class SourceSawtooth(Source):
         return numpy.concatenate(int(self._freq * self._time) * (wave,)), self._rate
 
 
-class SourceSilence(Source):
-    """Generate slient signal."""
+class SourceSequence(Source):
+    """Generate a sequence of notes to form a signal."""
 
-    def __init__(self, rate: int = 48_000, time: float = 1.0) -> None:
-        """Create a SourceSilence instance."""
-        self._rate = rate
-        self._time = time
+    def __init__(self, notes: list[Source]) -> None:
+        """Create a SourceSequence instance."""
+        self._notes = notes
 
     def name(self) -> str:
         """Find name."""
-        return "silence"
+        return "sequence"
 
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""
-        length = int(self._rate * self._time)
-        return numpy.zeros(length), self._rate
+        signal = numpy.concatenate([note.read()[0] for note in self._notes])
+        return signal, self._notes[0].read()[1]
 
 
 class SourceSine(Source):
@@ -339,41 +341,27 @@ class SourceWhiteNoise(Source):
 
 def select(name: str) -> Source:
     """Find source corresponding to given name."""
-    class_ = {
+    synth = synths().get(name)
+    if synth is None:
+        return SourceFile(name)
+    return synth()
+
+
+def synths() -> dict[str, type[Source]]:
+    """Find list of synth source names."""
+    return {
         "chirp": SourceChirp,
+        "constant": SourceConstant,
         "impulse": SourceImpulse,
         "linear": SourceLinear,
-        "none": SourceNone,
         "pink_noise": SourcePinkNoise,
         "rectangle": SourceRectangle,
         "sawtooth": SourceSawtooth,
-        "silence": SourceSilence,
         "sine": SourceSine,
         "square": SourceSquare,
         "unit_step": SourceUnitStep,
         "white_noise": SourceWhiteNoise,
-    }.get(name)
-    if class_ is None:
-        return SourceFile(name)
-    return class_()
-
-
-def synths() -> list[str]:
-    """Find list of synth source names."""
-    return [
-        "chirp",
-        "impulse",
-        "linear",
-        "none",
-        "pink_noise",
-        "rectangle",
-        "sawtooth",
-        "silence",
-        "sine",
-        "square",
-        "unit_step",
-        "white_noise",
-    ]
+    }
 
 
 def ui(default: str) -> tuple[State[Source], Html]:
@@ -387,7 +375,7 @@ def ui(default: str) -> tuple[State[Source], Html]:
         value=None,
     )
     synth = marimo.ui.dropdown(
-        synths(),
+        list(synths()),
         allow_select_none=True,
         label="Synth Generator",
         on_change=lambda name: set_file(select(name)),
@@ -406,7 +394,17 @@ def ui(default: str) -> tuple[State[Source], Html]:
 </div>
         """.strip()
     ).batch(
-        file=file,  # ty:ignore[invalid-argument-type]
-        synth=synth,  # ty:ignore[invalid-argument-type]
-        upload=upload,  # ty:ignore[invalid-argument-type]
+        file=file,
+        synth=synth,
+        upload=upload,
+    )
+
+
+def ui_synth(default: str) -> Html:
+    """Marimo input element to select an audio synth."""
+    return marimo.ui.dropdown(
+        synths(),
+        allow_select_none=True,
+        label="Synth Generator",
+        value=default,
     )

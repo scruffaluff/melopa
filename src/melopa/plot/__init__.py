@@ -70,9 +70,9 @@ def ui(
 </div>
         """.strip()
     ).batch(
-        backend=backend_,  # ty:ignore[invalid-argument-type]
-        kind=kind_,  # ty:ignore[invalid-argument-type]
-        overlay=overlay_,  # ty:ignore[invalid-argument-type]
+        backend=backend_,
+        kind=kind_,
+        overlay=overlay_,
     )
 
 

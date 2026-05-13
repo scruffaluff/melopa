@@ -21,7 +21,7 @@ def audio_list(audios: Iterable[dict[str, Any]]) -> Html:
             items.append(marimo.vstack([marimo.md(f"### {audio['name']}"), item]))
         else:
             items.append(item)
-    return marimo.hstack(items, gap=2, justify="start")
+    return marimo.hstack(items, gap=2, justify="start", wrap=True)
 
 
 def difference_matrix(
@@ -36,12 +36,17 @@ def difference_matrix(
     return marimo.ui.matrix(matrix, debounce=True, row_labels=["b", "a"])
 
 
-def editor(code: str | FunctionType) -> Html:
+def editor(*codes: str | FunctionType) -> Html:
     """Create a Marimo code editor."""
-    if isinstance(code, FunctionType):
-        code = inspect.getsource(code)
-    editor_ = marimo.ui.code_editor(code.strip(), debounce=True)
-    return Html("<div>{editor}</div>").batch(editor=editor_)  # ty:ignore[invalid-argument-type]
+    texts = []
+    for code in codes:
+        if isinstance(code, FunctionType):
+            texts.append(inspect.getsource(code).strip())
+        else:
+            texts.append(code.strip())
+    text = "\n\n".join(texts)
+    editor_ = marimo.ui.code_editor(text, debounce=True)
+    return Html("<div>{editor}</div>").batch(editor=editor_)
 
 
 def run[T](func: Callable[[], T]) -> tuple[T, Html | None]:

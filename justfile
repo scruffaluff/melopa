@@ -31,8 +31,8 @@ build:
     build/site/data/
   )
   for notebook in $notebooks {
-    let mode = if ($notebook | find --regex '\.edit\.md$' | is-empty) { "run" } else { "edit" }
-    let subpath = $notebook | path basename | str replace --regex '(\.edit)?\.md$' ""
+    let subpath = $notebook | path parse | get stem
+    let mode = if $subpath == "scratchpad" { "edit" } else { "run" }
     let html = $"build/site/($subpath).html"
     (
       uv run marimo --yes export html-wasm --mode $mode --output $html

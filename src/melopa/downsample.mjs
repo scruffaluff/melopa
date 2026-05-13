@@ -57,7 +57,8 @@ export function lttb(x, y, size) {
       right = [right[0] / bsize, right[1] / bsize];
     }
 
-    // Find middle bucket point for max triangle area.
+    // Find middle bucket point for max triangle area. Based on
+    // https://en.wikipedia.org/wiki/Area_of_a_triangle#Using_coordinates.
     for (let bindex = start; bindex < stop; bindex++) {
       const determinant =
         (left[0] - right[0]) * (y[bindex] - left[1]) -

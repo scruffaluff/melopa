@@ -12,12 +12,12 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.23.1
-title: Compressor
+marimo-version: 0.23.6
+title: Compression
 width: medium
 ---
 
-# Compressor
+# Compression
 
 ```python {.marimo name="setup"}
 import sys
@@ -41,21 +41,26 @@ current volume of the signal and then uses the following parameters.
 
 - _Threshold (T)_ controls the minimum amplitude for compression to be applied.
   Any sample above the threshold is attenuated.
-- _Ratio (R)_ controls the amount of compression to be applied for samples above
-  the threshold.
-- _Attack_ controls how quickly compression is applied after going above the
+- _Ratio (R)_ controls the amount of compression in decibels to be applied for
+  samples above the threshold.
+- _Attack (A)_ controls how quickly compression is applied after going above the
   threshold.
-- _Release_ controls how quickly compression is stopped after going below the
+- _Release (L)_ controls how quickly compression is stopped after going below the
   threshold.
 - _Knee (K)_ softens the threshold transition by rounding its edge.
 - _Gain (G)_ applies additional volume to the signal after compression and
   compensates for the reduction in signal amplitude.
 
-The compression algorithm without the _attack_ or _release_ parameters is
-described by the following formula[[1]](#1).
+The compression algorithm is commonly split into two routines, level detection
+and gain computer. The level detector routine measures the volume of the signal to
+find when the threshold has been crossed.
+
+The gain computer routine determines how to scale the signal after the level
+detector finds a threshold crossing. Its algorithm is described by the following
+formula[[1]](#1).
 
 $$
-f(x) = G \begin{cases}
+f(x) = \begin{cases}
 x & \text{ when } x < T - \frac{K}{2} \\
 x + \frac{(1 - R)(x - T + K/2)^2}{2KR} & \text{ when } T - \frac{K}{2} \leq x < T + \frac{K}{2} \\
 T + (x - T)/R & \text{ when } x \geq T + \frac{K}{2} \\
@@ -65,49 +70,32 @@ $$
 The algorithm is implemented with the following editable code.
 
 ```python {.marimo}
-code = f"""
-def compress(
-    signal: NDArray,
-    gain: float = 1.0,
-    knee: float = 0.0,
-    ratio: float = 4.0,
-    threshold: float = 0.8,
-) -> NDArray:
-    sign = numpy.sign(signal)
-    amplitude = level(signal)
-
-    for index in range(len(amplitude)):
-        value = amplitude[index] - threshold
-        if value > knee / 2:
-            amplitude[index] = threshold + value / ratio
-        elif value > -knee / 2:
-            smoothing = (value + knee / 2) ** 2 / (2 * knee * ratio)
-            amplitude[index] += (1 - ratio) * smoothing
-
-    return gain * sign * amplitude
-
-
-def level(signal: NDArray) -> NDArray:
-    a = 0.1
-    amplitude = numpy.abs(signal)
-    return scipy.signal.lfilter([1 - a], [1, a], amplitude)
-"""
-```
-
-```python {.marimo}
-editor_ui = melopa.ui.editor(code)
+editor_ui = melopa.ui.editor(
+    melopa.code.compress, melopa.code.gain_compute, melopa.code.level_detect
+)
 signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
-gain_ui = mo.ui.slider(
-    1, 10, 0.01, debounce=True, label="Gain", show_value=True, value=1.0
+attack_ui = mo.ui.slider(
+    0, 100, 1, debounce=True, label="Attack", show_value=True, value=0
 )
 knee_ui = mo.ui.slider(
     0, 1, 0.01, debounce=True, label="Knee", show_value=True, value=0.0
 )
 ratio_ui = mo.ui.slider(
-    1, 100, 0.1, debounce=True, label="Ratio", show_value=True, value=4.0
+    debounce=True,
+    label="Ratio",
+    show_value=True,
+    steps=numpy.round(numpy.logspace(0, 4, 33, base=2), 2),
+    value=4.0,
+)
+release_ui = mo.ui.slider(
+    0, 100, 1, debounce=True, label="Release", show_value=True, value=0
 )
 threshold_ui = mo.ui.slider(
-    0, 1, 0.01, debounce=True, label="Threshold", show_value=True, value=0.8
+    debounce=True,
+    label="Threshold",
+    show_value=True,
+    steps=[0, *-numpy.round(numpy.logspace(-2, 6, 33, base=2), 2)],
+    value=-8,
 )
 plot_ui = melopa.plot.ui()
 
@@ -116,7 +104,10 @@ mo.ui.tabs(
         "Code": editor_ui,
         "Signal": signal_ui,
         "Parameter": mo.hstack(
-            [gain_ui, knee_ui, ratio_ui, threshold_ui], gap=2, justify="start"
+            [attack_ui, knee_ui, ratio_ui, release_ui, threshold_ui],
+            gap=2,
+            justify="start",
+            wrap=True,
         ),
         "Plot": plot_ui,
     },
@@ -130,17 +121,43 @@ signal, rate = signal_source.read()
 exec(editor_ui.value["editor"])
 processed, output = melopa.ui.run(
     lambda: compress(
-        signal, gain_ui.value, knee_ui.value, ratio_ui.value, threshold_ui.value
+        signal,
+        rate * attack_ui.value / 1_000,
+        knee_ui.value,
+        ratio_ui.value,
+        rate * release_ui.value / 1_000,
+        threshold_ui.value,
     )
 )
 output
 ```
 
 ```python {.marimo}
+volume = melopa.math.decibel(signal)
+reduction = gain_compute(volume, knee_ui.value, ratio_ui.value, threshold_ui.value)
+level = level_detect(reduction, attack_ui.value, release_ui.value)
+melopa.plot.signal(
+    [
+        {
+            "rate": rate,
+            "y": numpy.power(10, reduction / 20),
+            "legend_label": "reduction",
+        },
+        {
+            "rate": rate,
+            "y": numpy.power(10, level / 20),
+            "legend_label": "level",
+        },
+    ],
+    title=signal_source.name(),
+    **plot_ui.value,
+)
+```
+
+```python {.marimo}
 melopa.plot.signal(
     [
         {"rate": rate, "y": signal, "legend_label": "original"},
-        {"rate": rate, "y": level(signal), "legend_label": "level"},
         {"rate": rate, "y": processed, "legend_label": "compressed"},
     ],
     title=signal_source.name(),

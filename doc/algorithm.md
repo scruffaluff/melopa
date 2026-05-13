@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.23.1
+marimo-version: 0.23.6
 title: Algorithm
 width: medium
 ---
@@ -36,14 +36,14 @@ import melopa
 
 ## Resample
 
-Resampling in the process of changing the sample rate of an existing signal. We
-can resample in the time domain by periodically removing or inserting interpolated
-samples and then applying lowpass filters to prevent aliasing. However, it more
-trivial to resample in the frequency domain. By removing the upper frequencies
-of the Fourier transform we decrease the sample rate. Similarly by zero padding
-after the upper frequencies, we increase the sampling rate. Playing back the
-resampled signal at the original sample rate will change the speed of the signal
-as shown below.
+Resampling is the process of changing the sample rate of an existing signal. We
+can resample in the time domain by periodically removing or inserting
+interpolated samples and then applying lowpass filters to prevent aliasing.
+However, it more trivial to resample in the frequency domain. By removing the
+upper frequencies of the Fourier transform we decrease the sample rate.
+Similarly by zero padding after the upper frequencies, we increase the sampling
+rate. Playing back the resampled signal at the original sample rate will change
+the speed of the signal as shown below.
 
 ```python {.marimo}
 editor_ui = melopa.ui.editor(melopa.code.resample)
@@ -52,7 +52,7 @@ ratio_ui = mo.ui.slider(
     debounce=True,
     label="Ratio",
     show_value=True,
-    steps=numpy.round(numpy.logspace(-1, 1, 17), 2),
+    steps=numpy.round(numpy.logspace(-1, 1, 33), 2),
     value=1,
 )
 plot_ui = melopa.plot.ui()
@@ -61,7 +61,7 @@ mo.ui.tabs(
     {
         "Code": editor_ui,
         "Signal": signal_ui,
-        "Parameter": mo.hstack([ratio_ui], gap=2, justify="start"),
+        "Parameter": mo.hstack([ratio_ui], gap=2, justify="start", wrap=True),
         "Plot": plot_ui,
     },
     label="Controls",

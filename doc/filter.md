@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.23.1
+marimo-version: 0.23.6
 title: Filter
 width: medium
 ---
@@ -153,7 +153,7 @@ bwf_cutoff_ui = mo.ui.slider(
     show_value=True,
 )
 bwf_order_ui = mo.ui.slider(1, 10, 1, label="Order", show_value=True, value=4)
-mo.hstack([bwf_cutoff_ui, bwf_order_ui], justify="start")
+mo.hstack([bwf_cutoff_ui, bwf_order_ui], justify="start", wrap=True)
 ```
 
 ```python {.marimo}

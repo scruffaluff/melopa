@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.23.1
+marimo-version: 0.23.6
 title: Reverb
 width: medium
 ---
@@ -169,7 +169,7 @@ mo.ui.tabs(
     {
         "Code": editor_ui,
         "Signal": signal_ui,
-        "Parameter": mo.hstack([wet_ui], gap=2, justify="start"),
+        "Parameter": mo.hstack([wet_ui], gap=2, justify="start", wrap=True),
         "Plot": plot_ui,
     },
     label="Controls",
