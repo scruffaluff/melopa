@@ -4,10 +4,13 @@
 
 set script-interpreter := ["nu"]
 set shell := ["nu", "--commands"]
+export DENO_INSTALL_ROOT := ".vendor/lib/deno"
 export PATH := if os() == "windows" {
-  justfile_directory() / ".vendor/bin;" + env("PATH")
+  justfile_directory() / ".vendor/bin;" + justfile_directory() /
+  ".vendor/lib/deno/bin;" + env("PATH")
 } else {
-  justfile_directory() / ".vendor/bin:" + env("PATH")
+  justfile_directory() / ".vendor/bin:" + justfile_directory() /
+  ".vendor/lib/deno/bin:" + env("PATH")
 }
 
 # Build website.
@@ -56,12 +59,12 @@ dev +paths="doc":
 
 # Fix code formatting.
 format +paths=".":
-  deno run --allow-all npm:prettier --write {{paths}}
+  prettier --write {{paths}}
   uv run ruff format {{paths}}
 
 # Run code analyses.
 lint +paths=".":
-  deno run --allow-all npm:prettier --check {{paths}}
+  prettier --check {{paths}}
   uv run ruff format --check {{paths}}
   uv run ruff check {{paths}}
   uv run ty check {{paths}}
@@ -124,6 +127,11 @@ setup: _setup
     }
   }
   print $"Using (miniserve --version)."
+  if (which prettier | is-empty) {
+    print "Installing Prettier."
+    deno install --allow-all --global npm:prettier
+  }
+  print $"Using Prettier (prettier --version)."
   if (which uv | is-empty) {
     print "Installing Uv."
     http get https://scruffaluff.github.io/picoware/install/uv.nu
@@ -131,10 +139,11 @@ setup: _setup
   }
   print $"Using (uv --version)."
   print "Installing Python packages with Deno and Uv."
-  if ($env.JUST_INIT? | is-empty) {
-    uv sync --locked
-  } else {
+  if ($env.INIT? | into bool --relaxed) {
     uv sync
+    just format
+  } else {
+    uv sync --locked
   }
 
 [unix]
@@ -171,8 +180,13 @@ test-js +args='run':
   deno run --allow-all npm:vitest {{args}}
 
 # Run Python test suite.
+[script]
 test-py *args:
-  uv run pytest {{args}}
+  if ($env.DEBUG? | into bool --relaxed) {
+    uv run pytest --pdb {{args}}
+  } else {
+    uv run pytest {{args}}
+  }
 
 # Wrapper to Uv.
 [no-exit-message]
