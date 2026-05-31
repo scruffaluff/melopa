@@ -89,7 +89,7 @@ jobs:
       - name: Build documentation
         run: just setup build
       - name: Upload documentation
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           name: pages
           path: build/site
