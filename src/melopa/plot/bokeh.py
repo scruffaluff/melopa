@@ -1,7 +1,7 @@
 """Plotting routines with Bokeh."""
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy
 from bokeh import io, layouts, palettes, plotting, transform
@@ -57,10 +57,10 @@ def figure(*args: Any, **kwargs: Any) -> plotting.figure:
     return figure_
 
 
-def gridplot(plots: list[UIElement | None]) -> Pane:
+def gridplot(plots: list[plotting.figure]) -> Pane:
     """Melopa wrapper for Bokeh gridplot."""
     return layouts.gridplot(
-        [plots],
+        cast("list[list[UIElement | None]]", [plots]),
         sizing_mode="stretch_width",
         toolbar_location="above",
     )
@@ -70,7 +70,7 @@ def phase(
     signals: list[dict], overlay: bool = True, size: int = PLOT_SIZE, **kwargs: Any
 ) -> Pane:
     """Plot audio frequency phase with Bokeh."""
-    plots = []
+    plots: list[plotting.figure] = []
     palette = util.palette_cycle()
     ticks = util.spectrum_ticks()
     x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
@@ -124,7 +124,7 @@ def phase(
     if len(plots) == 1:
         return plots[0]
     return layouts.gridplot(
-        [plots],
+        cast("list[list[UIElement | None]]", [plots]),
         sizing_mode="stretch_width",
         toolbar_location="above",
     )
@@ -132,7 +132,7 @@ def phase(
 
 def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> Pane:
     """Plot audio frequency time heatmap with Bokeh."""
-    plots = []
+    plots: list[plotting.figure] = []
     palette = palettes.viridis(6)
     ticks = util.spectrum_ticks()
     x_range, y_range, z_range = util.axis_ranges(kwargs, y_range=(20, 20_000))
@@ -203,7 +203,7 @@ def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> 
     if len(plots) == 1:
         return plots[0]
     return layouts.gridplot(
-        [plots],
+        cast("list[list[UIElement | None]]", [plots]),
         sizing_mode="stretch_width",
         toolbar_location="above",
     )
@@ -217,7 +217,7 @@ def spectrum(
     **kwargs: Any,
 ) -> Pane:
     """Plot audio frequency spectrum with Bokeh."""
-    plots = []
+    plots: list[plotting.figure] = []
     palette = util.palette_cycle()
     ticks = util.spectrum_ticks()
     x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
@@ -271,7 +271,7 @@ def spectrum(
     if len(plots) == 1:
         return plots[0]
     return layouts.gridplot(
-        [plots],
+        cast("list[list[UIElement | None]]", [plots]),
         sizing_mode="stretch_width",
         toolbar_location="above",
     )
@@ -285,7 +285,7 @@ def waveform(
     **kwargs: Any,
 ) -> Pane:
     """Plot audio waveform with Bokeh."""
-    plots = []
+    plots: list[plotting.figure] = []
     palette = util.palette_cycle()
     x_range, y_range, _ = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
 
@@ -335,7 +335,7 @@ def waveform(
     if len(plots) == 1:
         return plots[0]
     return layouts.gridplot(
-        [plots],
+        cast("list[list[UIElement | None]]", [plots]),
         sizing_mode="stretch_width",
         toolbar_location="above",
     )

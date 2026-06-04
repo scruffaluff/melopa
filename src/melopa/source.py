@@ -2,6 +2,7 @@
 
 import abc
 import sys
+import typing
 from abc import ABC
 from io import BytesIO
 from pathlib import Path
@@ -43,6 +44,7 @@ class SourceChirp(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "chirp"
@@ -64,6 +66,7 @@ class SourceConstant(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "constant"
@@ -102,11 +105,15 @@ class SourceFile(Source):
         return self._file.stem
 
     def read(self) -> tuple[NDArray, int]:
-        """Load audio signal."""
+        """Load audio signal.
+
+        Raises:
+            FileNotFoundError: If unable to find source notebook.
+        """
         folder = marimo.notebook_location()
         if folder is None:
             message = "Unable to find notebook location."
-            raise ValueError(message)
+            raise FileNotFoundError(message)
 
         if sys.platform == "emscripten":
             url = str(folder / f"data/audio/{self._file}")
@@ -147,6 +154,7 @@ class SourceImpulse(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "impulse"
@@ -166,6 +174,7 @@ class SourceLinear(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "linear"
@@ -183,6 +192,7 @@ class SourcePinkNoise(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "pink_noise"
@@ -207,6 +217,7 @@ class SourceRectangle(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "rectangle"
@@ -230,6 +241,7 @@ class SourceSawtooth(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "sawtooth"
@@ -247,6 +259,7 @@ class SourceSequence(Source):
         """Create a SourceSequence instance."""
         self._notes = notes
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "sequence"
@@ -268,6 +281,7 @@ class SourceSine(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "sine"
@@ -289,6 +303,7 @@ class SourceSquare(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "square"
@@ -309,6 +324,7 @@ class SourceUnitStep(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "unit_step"
@@ -329,6 +345,7 @@ class SourceWhiteNoise(Source):
         self._rate = rate
         self._time = time
 
+    @typing.override
     def name(self) -> str:
         """Find name."""
         return "white_noise"

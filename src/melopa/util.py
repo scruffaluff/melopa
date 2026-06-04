@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 import marimo
-from marimo._runtime.context.types import ContextNotInitializedError
+from marimo._runtime.context.types import ContextNotInitializedError  # noqa: PLC2701
 
 
 def config_marimo() -> None:

@@ -13,7 +13,7 @@ export PATH := if os() == "windows" {
   ".vendor/lib/deno/bin:" + env("PATH")
 }
 
-# Build website.
+# Build project website.
 [script]
 build:
   let notebooks = ls doc/*.md | get name | path relative-to doc
@@ -48,15 +48,6 @@ build:
 # Execute CI workflow commands.
 ci: setup lint build test
 
-# Wrapper to Deno.
-[no-exit-message]
-@deno *args:
-  deno {{args}}
-
-# Launch notebooks in developer mode.
-dev +paths="doc":
-  uv run marimo --yes edit --no-sandbox --watch {{paths}}
-
 # Fix code formatting.
 format +paths=".":
   prettier --write {{paths}}
@@ -78,6 +69,11 @@ lint +paths=".":
 [no-exit-message]
 @nu *args:
   nu --commands "{{args}}"
+
+# Execute project notebooks.
+[no-exit-message]
+run +paths="doc":
+  uv run marimo --yes edit --no-sandbox --watch {{paths}}
 
 # Serve built website.
 serve *flags: build
@@ -138,7 +134,7 @@ setup: _setup
     | nu -c $"($in | decode); main --preserve-env --dest .vendor/bin"
   }
   print $"Using (uv --version)."
-  print "Installing Python packages with Deno and Uv."
+  print "Installing Python packages with Uv."
   if ($env.INIT? | into bool --relaxed) {
     uv sync
     just format

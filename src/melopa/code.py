@@ -10,6 +10,7 @@ import melopa
 
 def compress(
     signal: NDArray,
+    *,
     attack: int = 0,
     knee: float = 0.0,
     ratio: float = 4.0,

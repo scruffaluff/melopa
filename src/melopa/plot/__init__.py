@@ -84,7 +84,11 @@ def signal(
     overlay: bool = True,
     **kwargs: Any,
 ) -> Html:
-    """Plot audio signals."""
+    """Plot audio signals.
+
+    Raises:
+        ValueError: If kind value is invalid.
+    """
     module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
 
     match kind.lower():
