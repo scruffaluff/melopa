@@ -10,7 +10,7 @@ from melopa.plot import util
 
 # Disable Matplotlib font cache logs. Based on
 # https://github.com/matplotlib/matplotlib/issues/23326#issuecomment-1164772708.
-matplotlib.set_loglevel("critical")
+matplotlib.set_loglevel("CRITICAL")
 
 
 def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:

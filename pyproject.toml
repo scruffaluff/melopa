@@ -9,27 +9,27 @@ requires = ["uv-build~=0.11"]
 
 [dependency-groups]
 dev = [
-  "coverage~=7.13",
+  "coverage~=7.14",
   "jinja2-cli~=1.0",
-  "pytest~=9.0",
-  "pytest-cov~=7.0",
+  "pytest~=9.1",
+  "pytest-cov~=7.1",
   "pytest-mock~=3.15",
   "python-lsp-server~=1.14",
   "pyzmq~=27.1",
-  "ruff~=0.15.10",
-  "ty~=0.0.43",
+  "ruff~=0.15.18",
+  "ty~=0.0.50",
 ]
 
 [project]
 # Dependency constraints must be flexible for WASM compatibility with Micropip.
 dependencies = [
-  "bokeh~=3.6",
-  "marimo~=0.23.7",
-  "matplotlib~=3.8",
-  "numpy~=2.0",
-  "polars~=1.24",
-  "scipy~=1.14",
-  "soundfile~=0.13.0",
+  "bokeh~=3.9",
+  "marimo~=0.23.10",
+  "matplotlib~=3.10",
+  "numpy~=2.4",
+  "polars~=1.33",
+  "scipy~=1.17",
+  "soundfile~=0.12.0",
 ]
 description = "Interactive Python audio notebooks."
 keywords = []
@@ -89,6 +89,7 @@ ignore = [
   "COM",     # Rule conflicts with formatter.
   "CPY001",  # There should not a copyright notice in every module.
   "DOC201",  # Not every function docstring needs a returns section.
+  "DOC402",  # Not every generator docstring needs a yields section.
   "EXE003",  # Uv should be shebang executor.
   "FBT",     # Boolean function arguments are acceptable.
   "FIX",     # Todo comments are acceptable.

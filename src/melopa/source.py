@@ -11,11 +11,11 @@ from urllib import request
 import marimo
 import numpy
 import scipy
+import soundfile
 from marimo import Html
 from marimo._plugins.ui._impl.input import FileUploadResults
 from marimo._runtime.state import State
 from numpy.typing import NDArray
-from scipy.io import wavfile
 
 from melopa import math, util
 
@@ -118,10 +118,10 @@ class SourceFile(Source):
         if sys.platform == "emscripten":
             url = str(folder / f"data/audio/{self._file}")
             content = BytesIO(request.urlopen(url).read())  # noqa: S310
-            rate, signal = wavfile.read(content)
+            signal, rate = soundfile.read(content)
         else:
             path = util.repo_path() / f"data/audio/{self._file}"
-            rate, signal = wavfile.read(path)
+            signal, rate = soundfile.read(path)
         if len(signal.shape) > 1:
             signal = numpy.mean(signal, axis=1)
         return math.normalize(signal), rate
@@ -140,7 +140,7 @@ class SourceInput(Source):
 
     def read(self) -> tuple[NDArray, int]:
         """Load audio signal."""
-        rate, signal = wavfile.read(BytesIO(self._input.contents))
+        signal, rate = soundfile.read(BytesIO(self._input.contents))
         if len(signal.shape) > 1:
             signal = numpy.mean(signal, axis=1)
         return math.normalize(signal), rate

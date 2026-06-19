@@ -4,7 +4,7 @@
 
 set script-interpreter := ["nu"]
 set shell := ["nu", "--commands"]
-export DENO_INSTALL_ROOT := ".vendor/lib/deno"
+export DENO_INSTALL_ROOT := justfile_directory() / ".vendor/lib/deno"
 export PATH := if os() == "windows" {
   justfile_directory() / ".vendor/bin;" + justfile_directory() /
   ".vendor/lib/deno/bin;" + env("PATH")
@@ -13,7 +13,7 @@ export PATH := if os() == "windows" {
   ".vendor/lib/deno/bin:" + env("PATH")
 }
 
-# Build project website.
+# Build project for release.
 [script]
 build:
   let notebooks = ls doc/*.md | get name | path relative-to doc
@@ -45,32 +45,32 @@ build:
   }
   rm --force --recursive build/site/files build/site/CLAUDE.md
 
-# Execute CI workflow commands.
-ci: setup lint build test
+# Run continuous integration pipeline.
+ci: setup lint test build
 
-# Fix code formatting.
+# Format project files.
 format +paths=".":
   prettier --write {{paths}}
   uv run ruff format {{paths}}
 
-# Run code analyses.
+# Analyze files for issues.
 lint +paths=".":
   prettier --check {{paths}}
   uv run ruff format --check {{paths}}
   uv run ruff check {{paths}}
   uv run ty check {{paths}}
 
-# List all commands available in justfile.
+# List available commands.
 [default]
 @list:
   just --list
 
-# Wrapper to Nushell.
+# Run Nushell in project environment.
 [no-exit-message]
-@nu *args:
+@nu *args="nu --login":
   nu --commands "{{args}}"
 
-# Execute project notebooks.
+# Run project notebooks.
 [no-exit-message]
 run +paths="doc":
   uv run marimo --yes edit --no-sandbox --watch {{paths}}
@@ -79,7 +79,7 @@ run +paths="doc":
 serve *flags: build
   miniserve --route-prefix /melopa build/site {{flags}}
 
-# Install development dependencies.
+# Install development tools and dependencies.
 [script]
 setup: _setup
   let ext = if $nu.os-info.name == "windows" { ".exe" } else { "" }
@@ -168,14 +168,14 @@ _setup:
   }
   Write-Output "Using Nushell $(nu --version)."
 
-# Run test suites.
+# Run tests (use DEBUG=1 for debugger).
 test: test-js test-py
 
-# Run JavaScript test suite.
+# Run JavaScripts.
 test-js +args='run':
   deno run --allow-all npm:vitest {{args}}
 
-# Run Python test suite.
+# Run Python tests (use DEBUG=1 for debugger).
 [script]
 test-py *args:
   if ($env.DEBUG? | into bool --relaxed) {
@@ -184,7 +184,7 @@ test-py *args:
     uv run pytest {{args}}
   }
 
-# Wrapper to Uv.
+# Run Uv in project environment.
 [no-exit-message]
 @uv *args:
   uv {{args}}
