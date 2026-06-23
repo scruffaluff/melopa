@@ -57,7 +57,7 @@ find when the threshold has been crossed.
 
 The gain computer routine determines how to scale the signal after the level
 detector finds a threshold crossing. Its algorithm is described by the following
-formula[[1]](#1).
+formula [[1]](#r1).
 
 $$
 f(x) = \begin{cases}
@@ -174,10 +174,10 @@ melopa.ui.audio_list([
 
 ## References
 
-<a id="1">[1]</a> Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua.
+<span id="r1">[1]</span> Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua.
 (2012).
 [Digital Dynamic Range Compressor Design—A Tutorial and Analysis](https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysis).
 AES: Journal of the Audio Engineering Society. 60.
 
-<a id="2">[2]</a> McCormack, Leo and Valimaki, Vesa and others.
+<span id="r2">[2]</span> McCormack, Leo and Valimaki, Vesa and others.
 [FFT-based dynamic range compression](https://leomccormack.github.io/sparta-site/docs/help/related-publications/mccormack2017fft.pdf). 2017.

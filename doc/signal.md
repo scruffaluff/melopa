@@ -213,7 +213,7 @@ Follow the next notebook <a href="/melopa/filter.html">Filters</a>.
 
 ## References
 
-<a id="1">[1]</a> Oppenheim, Alan V., and Roland W. Schafer.
+<span id="r1">[1]</span> Oppenheim, Alan V., and Roland W. Schafer.
 [Discrete-Time Signal Processing](https://books.google.com/books/about/Discrete_time_Signal_Processing.html).
 Third edition, Pearson New international edition, Pearson, 2014. Always
 Learning.

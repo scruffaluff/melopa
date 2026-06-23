@@ -44,7 +44,7 @@ sound to drop by 60 decibels from its initial value.
 
 ## Moorer Algorithm
 
-We start our reverb analysis by implementing an algorithm by James Moorer[1].
+We start our reverb analysis by implementing an algorithm by James Moorer [[1]](#r1).
 His algorithm splits reverberation into distincter early reflections and less
 distinct late reflections. The early reflections are modeled by a series of
 delays and the late reflections are modeled by a comb filter. These reflections
@@ -204,7 +204,7 @@ melopa.ui.audio_list([
 
 ## References
 
-<a id="1">[1]</a> Moorer, James A.
+<span id="r1">[1]</span> Moorer, James A.
 [About This Reverberation Business.](https://www.researchgate.net/publication/239735102_About_This_Reverberation_Business)
 Computer Music Journal, vol. 3, no. 2, June 1979, p. 13. DOI.org (Crossref),
 https://doi.org/10.2307/3680280.
