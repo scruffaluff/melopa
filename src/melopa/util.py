@@ -4,7 +4,9 @@ import os
 from pathlib import Path
 
 import marimo
-from marimo._runtime.context.types import ContextNotInitializedError  # noqa: PLC2701
+from marimo._runtime.context.types import (  # ruff:ignore[import-private-name]
+    ContextNotInitializedError,
+)
 
 
 def config_marimo() -> None:
@@ -14,7 +16,7 @@ def config_marimo() -> None:
     in WASM builds.
     """
     try:
-        marimo_config = marimo._runtime.context.get_context().marimo_config  # noqa: SLF001  # ty:ignore[possibly-missing-submodule]
+        marimo_config = marimo._runtime.context.get_context().marimo_config  # ruff:ignore[private-member-access]  # ty:ignore[possibly-missing-submodule]
     except ContextNotInitializedError:
         return
     marimo_config["runtime"]["output_max_bytes"] = 1000000000

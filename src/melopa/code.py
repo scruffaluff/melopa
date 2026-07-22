@@ -1,6 +1,6 @@
 """Source code for notebook examples."""
 
-# ruff: noqa: D103, N806, PLR0913
+# ruff:file-ignore[undocumented-public-function, non-lowercase-variable-in-function, too-many-arguments]
 
 import numpy
 from numpy.typing import NDArray

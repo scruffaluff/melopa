@@ -55,7 +55,7 @@ def run[T](func: Callable[[], T]) -> tuple[T, Html | None]:
     with marimo.capture_stderr() as stderr_, marimo.capture_stdout() as stdout_:
         try:
             result = func()
-        except Exception:  # noqa: BLE001
+        except Exception:  # ruff:ignore[blind-except]
             return cast("T", None), marimo.callout(
                 Html(f'<pre style="overflow: auto;">{traceback.format_exc()}</pre>'),
                 kind="danger",

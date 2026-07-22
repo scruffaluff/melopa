@@ -117,7 +117,7 @@ class SourceFile(Source):
 
         if sys.platform == "emscripten":
             url = str(folder / f"data/audio/{self._file}")
-            content = BytesIO(request.urlopen(url).read())  # noqa: S310
+            content = BytesIO(request.urlopen(url).read())  # ruff:ignore[suspicious-url-open-usage]
             signal, rate = soundfile.read(content)
         else:
             path = util.repo_path() / f"data/audio/{self._file}"
