@@ -3,17 +3,49 @@
 from typing import Any
 
 import matplotlib
+import numpy
 from matplotlib import pyplot
 from matplotlib.figure import Figure
+from numpy.typing import ArrayLike
 
 from melopa.plot import util
+from melopa.plot.util import Signal
 
 # Disable Matplotlib font cache logs. Based on
 # https://github.com/matplotlib/matplotlib/issues/23326#issuecomment-1164772708.
 matplotlib.set_loglevel("CRITICAL")
 
 
-def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
+def line(
+    *signals: ArrayLike, overlay: bool = True, x: ArrayLike | None = None, **kwargs: Any
+) -> Figure:
+    """Plot line with Matplotlib."""
+    palette = util.palette_cycle()
+    x_range, y_range, _ = util.axis_ranges(kwargs)
+
+    figure, axes = subplots(ncols=1 if overlay else len(signals), squeeze=False)
+    axes = axes[0]
+
+    for index, signal in enumerate(signals):
+        color = next(palette)
+        y = numpy.asarray(signal)
+        x = numpy.arange(len(y))
+        x_range += (x[0], x[-1])
+        y_range += (y.min(), y.max())
+
+        axis = axes[0 if overlay else index]
+        axis.plot(x, y, color=color)
+        axis.set_title(kwargs.pop("title", None))
+
+    for axis in axes:
+        if x_range.valid():
+            axis.set_xlim(x_range.start, x_range.stop)
+        if y_range.valid():
+            axis.set_ylim(y_range.start, y_range.stop)
+    return figure
+
+
+def phase(*signals: Signal, overlay: bool = True, **kwargs: Any) -> Figure:
     """Plot audio frequency phase with Matplotlib."""
     palette = util.palette_cycle()
     x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
@@ -24,8 +56,13 @@ def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     ticks = util.spectrum_ticks()
 
     for index, signal in enumerate(signals):
-        color = signal.pop("color", next(palette))
-        label = signal.pop("legend_label", None)
+        if isinstance(signal, dict):
+            color = signal.pop("color", next(palette))
+            label = signal.pop("legend_label", None)
+        else:
+            color = next(palette)
+            label = None
+
         x, y = util.signal_phase(signal)
         y_range += (y.min(), y.max())
 
@@ -48,7 +85,7 @@ def phase(signals: list[dict], overlay: bool = True, **kwargs: Any) -> Figure:
     return figure
 
 
-def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> Figure:
+def spectrogram(*signals: Signal, normalize: bool = False, **kwargs: Any) -> Figure:
     """Plot audio frequency time heatmap with Matplotlib."""
     ticks = util.spectrum_ticks()
     x_range, y_range, _ = util.axis_ranges(kwargs, y_range=(20, 20_000))
@@ -84,7 +121,7 @@ def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> 
 
 
 def spectrum(
-    signals: list[dict], normalize: bool = False, overlay: bool = True, **kwargs: Any
+    *signals: Signal, normalize: bool = False, overlay: bool = True, **kwargs: Any
 ) -> Figure:
     """Plot audio frequency spectrum with Matplotlib."""
     palette = util.palette_cycle()
@@ -96,8 +133,13 @@ def spectrum(
     axes[0].set_ylabel("Volume (dB)")
 
     for index, signal in enumerate(signals):
-        color = signal.pop("color", next(palette))
-        label = signal.pop("legend_label", None)
+        if isinstance(signal, dict):
+            color = signal.pop("color", next(palette))
+            label = signal.pop("legend_label", None)
+        else:
+            color = next(palette)
+            label = None
+
         x, y = util.signal_spectrum(signal, normalize)
         y_range += (y.min(), y.max())
 
@@ -126,7 +168,7 @@ def subplots(*args: Any, **kwargs: Any) -> tuple[Figure, Any]:
 
 
 def waveform(
-    signals: list[dict], normalize: bool = False, overlay: bool = True, **kwargs: Any
+    *signals: Signal, normalize: bool = False, overlay: bool = True, **kwargs: Any
 ) -> Figure:
     """Plot audio waveform with Matplotlib."""
     palette = util.palette_cycle()
@@ -137,8 +179,13 @@ def waveform(
     axes[0].set_ylabel("Amplitude")
 
     for index, signal in enumerate(signals):
-        color = signal.pop("color", next(palette))
-        label = signal.pop("legend_label", None)
+        if isinstance(signal, dict):
+            color = signal.pop("color", next(palette))
+            label = signal.pop("legend_label", None)
+        else:
+            color = next(palette)
+            label = None
+
         x, y = util.signal_waveform(signal, normalize)
         x_range += (x[0], x[-1])
         y_range += (y.min(), y.max())

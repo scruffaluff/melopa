@@ -1,0 +1,11 @@
+# Python debugger settings file.
+#
+# For more information, visit https://docs.python.org/3/library/pdb.html.
+
+import bokeh.plotting
+import melopa.plot.bokeh
+
+def pline(*args, **kwargs): bokeh.plotting.show(melopa.plot.line(*args, **kwargs))
+def psign(*args, **kwargs): bokeh.plotting.show(melopa.plot.signal(*args, **kwargs))
+def pspec(*args, **kwargs): bokeh.plotting.show(melopa.plot.spectrum(*args, **kwargs))
+def pwave(*args, **kwargs): bokeh.plotting.show(melopa.plot.waveform(*args, **kwargs))

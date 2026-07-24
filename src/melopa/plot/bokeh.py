@@ -18,8 +18,10 @@ from bokeh.models import (
     Range1d,
     UIElement,
 )
+from numpy.typing import ArrayLike
 
 from melopa.plot import util
+from melopa.plot.util import Signal
 
 PLOT_SIZE = 16_384
 
@@ -66,8 +68,64 @@ def gridplot(plots: list[plotting.figure]) -> Pane:
     )
 
 
+def line(
+    *signals: ArrayLike,
+    overlay: bool = True,
+    size: int = PLOT_SIZE,
+    x: ArrayLike | None = None,
+    **kwargs: Any,
+) -> Pane:
+    """Plot line with Bokeh."""
+    plots: list[plotting.figure] = []
+    palette = util.palette_cycle()
+    x_range, y_range, _ = util.axis_ranges(kwargs)
+
+    for signal in signals:
+        color = next(palette)
+        y = numpy.asarray(signal)
+        x = numpy.arange(len(y))
+        x_range += (x[0], x[-1])
+        y_range += (y.min(), y.max())
+        source = ColumnDataSource(data={"x": x, "y": y})
+
+        if plots:
+            if overlay:
+                plot = plots[0]
+            else:
+                plot = figure(**kwargs)
+                plots.append(plot)
+        else:
+            plot = figure(**kwargs)
+            plots.append(plot)
+
+        plot.line(
+            x="x",
+            y="y",
+            color=color,
+            line_width=2,
+            source=source,
+        )
+        add_downsample(plot, source, size)
+
+    if x_range.valid():
+        plots[0].x_range = Range1d(start=x_range.start, end=x_range.stop)
+    if y_range.valid():
+        plots[0].y_range = Range1d(start=y_range.start, end=y_range.stop)
+    for plot in plots[1:]:
+        plot.x_range = plots[0].x_range
+        plot.y_range = plots[0].y_range
+
+    if len(plots) == 1:
+        return plots[0]
+    return layouts.gridplot(
+        cast("list[list[UIElement | None]]", [plots]),
+        sizing_mode="stretch_width",
+        toolbar_location="above",
+    )
+
+
 def phase(
-    signals: list[dict], overlay: bool = True, size: int = PLOT_SIZE, **kwargs: Any
+    *signals: Signal, overlay: bool = True, size: int = PLOT_SIZE, **kwargs: Any
 ) -> Pane:
     """Plot audio frequency phase with Bokeh."""
     plots: list[plotting.figure] = []
@@ -76,8 +134,13 @@ def phase(
     x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     for signal in signals:
-        color = signal.pop("color", next(palette))
-        method = signal.pop("method", "line")
+        if isinstance(signal, dict):
+            color = signal.pop("color", next(palette))
+            method = cast("str", signal.pop("method", "line"))
+        else:
+            color = next(palette)
+            method = "line"
+
         x, y = util.signal_phase(signal)
         y_range += (y.min(), y.max())
         source = ColumnDataSource(data={"x": x, "y": y})
@@ -103,13 +166,14 @@ def phase(
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
             plots.append(plot)
 
+        swargs = cast("dict[str, Any]", signal if isinstance(signal, dict) else {})
         getattr(plot, method)(
             x="x",
             y="y",
             color=color,
             line_width=2,
             source=source,
-            **signal,
+            **swargs,
         )
         add_downsample(plot, source, size)
 
@@ -130,7 +194,7 @@ def phase(
     )
 
 
-def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> Pane:
+def spectrogram(*signals: Signal, normalize: bool = False, **kwargs: Any) -> Pane:
     """Plot audio frequency time heatmap with Bokeh."""
     plots: list[plotting.figure] = []
     palette = palettes.viridis(6)
@@ -210,7 +274,7 @@ def spectrogram(signals: list[dict], normalize: bool = False, **kwargs: Any) -> 
 
 
 def spectrum(
-    signals: list[dict],
+    *signals: Signal,
     normalize: bool = False,
     overlay: bool = True,
     size: int = PLOT_SIZE,
@@ -223,8 +287,13 @@ def spectrum(
     x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
     for signal in signals:
-        color = signal.pop("color", next(palette))
-        method = signal.pop("method", "line")
+        if isinstance(signal, dict):
+            color = signal.pop("color", next(palette))
+            method = cast("str", signal.pop("method", "line"))
+        else:
+            color = next(palette)
+            method = "line"
+
         x, y = util.signal_spectrum(signal, normalize)
         y_range += (y.min(), y.max())
         source = ColumnDataSource(data={"x": x, "y": y})
@@ -250,13 +319,14 @@ def spectrum(
             plot.xaxis.ticker = FixedTicker(ticks=ticks[0])
             plots.append(plot)
 
+        swargs = cast("dict[str, Any]", signal if isinstance(signal, dict) else {})
         getattr(plot, method)(
             x="x",
             y="y",
             color=color,
             line_width=2,
             source=source,
-            **signal,
+            **swargs,
         )
         add_downsample(plot, source, size)
 
@@ -278,7 +348,7 @@ def spectrum(
 
 
 def waveform(
-    signals: list[dict],
+    *signals: Signal,
     normalize: bool = False,
     overlay: bool = True,
     size: int = PLOT_SIZE,
@@ -290,8 +360,13 @@ def waveform(
     x_range, y_range, _ = util.axis_ranges(kwargs, y_range=(-1.0, 1.0))
 
     for signal in signals:
-        color = signal.pop("color", next(palette))
-        method = signal.pop("method", "line")
+        if isinstance(signal, dict):
+            color = signal.pop("color", next(palette))
+            method = cast("str", signal.pop("method", "line"))
+        else:
+            color = next(palette)
+            method = "line"
+
         x, y = util.signal_waveform(signal, normalize)
         x_range += (x[0], x[-1])
         y_range += (y.min(), y.max())
@@ -314,13 +389,14 @@ def waveform(
             )
             plots.append(plot)
 
+        swargs = cast("dict[str, Any]", signal if isinstance(signal, dict) else {})
         getattr(plot, method)(
             x="x",
             y="y",
             color=color,
             line_width=2,
             source=source,
-            **signal,
+            **swargs,
         )
         add_downsample(plot, source, size)
 

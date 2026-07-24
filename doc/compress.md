@@ -137,18 +137,16 @@ volume = melopa.math.decibel(signal)
 reduction = gain_compute(volume, knee_ui.value, ratio_ui.value, threshold_ui.value)
 level = level_detect(reduction, attack_ui.value, release_ui.value)
 melopa.plot.signal(
-    [
-        {
-            "rate": rate,
-            "y": numpy.power(10, reduction / 20),
-            "legend_label": "reduction",
-        },
-        {
-            "rate": rate,
-            "y": numpy.power(10, level / 20),
-            "legend_label": "level",
-        },
-    ],
+    {
+        "rate": rate,
+        "y": numpy.power(10, reduction / 20),
+        "legend_label": "reduction",
+    },
+    {
+        "rate": rate,
+        "y": numpy.power(10, level / 20),
+        "legend_label": "level",
+    },
     title=signal_source.name(),
     **plot_ui.value,
 )
@@ -156,10 +154,8 @@ melopa.plot.signal(
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": rate, "y": signal, "legend_label": "original"},
-        {"rate": rate, "y": processed, "legend_label": "compressed"},
-    ],
+    {"rate": rate, "y": signal, "legend_label": "original"},
+    {"rate": rate, "y": processed, "legend_label": "compressed"},
     title=signal_source.name(),
     **plot_ui.value,
 )

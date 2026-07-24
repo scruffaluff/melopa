@@ -124,9 +124,7 @@ adsr_processed = melopa.modulate.adsr(
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": adsr_rate, "y": adsr_processed, "legend_label": "modulated"},
-    ],
+    {"rate": adsr_rate, "y": adsr_processed, "legend_label": "modulated"},
     title=adsr_source.name(),
     **adsr_plot_ui.value,
 )
@@ -199,9 +197,7 @@ fm_processed = melopa.math.normalize(
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": fm_rate, "y": fm_processed, "legend_label": "modulated"},
-    ],
+    {"rate": fm_rate, "y": fm_processed, "legend_label": "modulated"},
     title="Sine",
     **fm_plot_ui.value,
 )

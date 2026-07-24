@@ -78,10 +78,8 @@ output
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": rate, "y": signal, "legend_label": "original"},
-        {"rate": rate, "y": processed, "legend_label": "processed"},
-    ],
+    {"rate": rate, "y": signal, "legend_label": "original"},
+    {"rate": rate, "y": processed, "legend_label": "processed"},
     title=signal_source.name(),
     **plot_ui.value,
 )

@@ -66,6 +66,7 @@ formatting = { line_length = 80 }
 [tool.marimo.runtime]
 auto_instantiate = true
 output_max_bytes = 1000000000
+skip_update_check = true
 
 [tool.pytest]
 addopts = ["-sv"]
@@ -86,22 +87,23 @@ docstring-code-format = true
 flake8-annotations = { allow-star-arg-any = true }
 pydocstyle = { convention = "google" }
 ignore = [
-  "COM",     # Rule conflicts with formatter.
-  "missing-copyright-notice",  # There should not a copyright notice in every module.
-  "docstring-missing-returns",  # Not every function docstring needs a returns section.
-  "docstring-missing-yields",  # Not every generator docstring needs a yields section.
-  "shebang-missing-python",  # Uv should be shebang executor.
-  "FBT",     # Boolean function arguments are acceptable.
-  "FIX",     # Todo comments are acceptable.
-  "ICN",     # Import abbreviations reduce readability.
+
+  "COM", # Rule conflicts with formatter.
+  "missing-copyright-notice", # There should not a copyright notice in every module.
+  "docstring-missing-returns", # Not every function docstring needs a returns section.
+  "docstring-missing-yields", # Not every generator docstring needs a yields section.
+  "shebang-missing-python", # Uv should be shebang executor.
+  "FBT", # Boolean function arguments are acceptable.
+  "FIX", # Todo comments are acceptable.
+  "ICN", # Import abbreviations reduce readability.
   "magic-value-comparison", # Constant numerical comparisons are often readable.
-  "non-empty-init-module",  # Init modules should be able to contain code.
-  "assert",    # Assert statements are standard for test functions.
-  "subprocess-without-shell-equals-true",    # Rule warns about using subprocess commands without a solution.
-  "start-process-with-partial-path",    # Partial paths for process executables is more cross platform.
-  "print",    # Print statements are acceptable for CLI applications.
-  "p-print",    # Print statements are acceptable for CLI applications.
-  "TD",      # Todo formatting is excessive for personal projects.
+  "non-empty-init-module", # Init modules should be able to contain code.
+  "assert", # Assert statements are standard for test functions.
+  "subprocess-without-shell-equals-true", # Rule warns about using subprocess commands without a solution.
+  "start-process-with-partial-path", # Partial paths for process executables is more cross platform.
+  "print", # Print statements are acceptable for CLI applications.
+  "p-print", # Print statements are acceptable for CLI applications.
+  "TD", # Todo formatting is excessive for personal projects.
 ]
 select = ["ALL"]
 

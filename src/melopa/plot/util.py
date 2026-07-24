@@ -2,14 +2,16 @@
 
 import dataclasses
 import itertools
-from typing import Any, Self
+from typing import Any, Self, cast
 
 import numpy
 from bokeh.palettes import Category10
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 from scipy.signal import ShortTimeFFT
 
 from melopa import math
+
+type Signal = ArrayLike | dict[str, Any]
 
 
 @dataclasses.dataclass
@@ -67,30 +69,40 @@ def palette_cycle() -> itertools.cycle:
     return itertools.cycle(Category10[10])
 
 
-def signal_phase(signal: dict[str, Any]) -> tuple[NDArray, NDArray]:
+def signal_phase(signal: Signal) -> tuple[NDArray, NDArray]:
     """Extract frequency phase from signal dictionary."""
-    if "f" in signal:
-        y = signal.pop("f")
-    else:
-        y_ = signal.pop("y")
-        y = numpy.unwrap(numpy.angle(numpy.fft.rfft(y_)))
+    if isinstance(signal, dict):
+        signal = cast("dict[str, Any]", signal)
+        if "f" in signal:
+            y = signal.pop("f")
+        else:
+            y_ = signal.pop("y")
+            y = numpy.unwrap(numpy.angle(numpy.fft.rfft(y_)))
 
-    if "x" in signal:
-        x = signal.pop("x")
+        if "x" in signal:
+            x = signal.pop("x")
+        else:
+            length = 2 * (len(y) - 1)
+            rate = signal.pop("rate")
+            x = numpy.fft.rfftfreq(length, 1 / rate)
     else:
-        length = 2 * (len(y) - 1)
-        rate = signal.pop("rate")
-        x = numpy.fft.rfftfreq(length, 1 / rate)
+        y = numpy.asarray(signal)
+        x = numpy.arange(len(y))
 
     return x.astype(numpy.float32), y.astype(numpy.float32)
 
 
 def signal_spectrogram(
-    signal: dict[str, Any], normalize: bool = False
+    signal: Signal, normalize: bool = False
 ) -> tuple[NDArray, NDArray, NDArray]:
     """Extract time binned frequency spectrum from signal dictionary."""
-    y_ = signal.pop("y")
-    rate = signal.pop("rate")
+    if isinstance(signal, dict):
+        signal = cast("dict[str, Any]", signal)
+        y_ = signal.pop("y")
+        rate = signal.pop("rate")
+    else:
+        y_ = numpy.asarray(signal)
+        rate = 1
     length = len(y_)
 
     transform = ShortTimeFFT.from_window(
@@ -110,33 +122,39 @@ def signal_spectrogram(
     return x, y, math.decibel(z).astype(numpy.float32)
 
 
-def signal_spectrum(
-    signal: dict[str, Any], normalize: bool = False
-) -> tuple[NDArray, NDArray]:
+def signal_spectrum(signal: Signal, normalize: bool = False) -> tuple[NDArray, NDArray]:
     """Extract frequency spectrum from signal dictionary."""
-    y = signal.pop("f") if "f" in signal else numpy.fft.rfft(signal.pop("y"))
-    if "x" in signal:
-        x = signal.pop("x")
+    if isinstance(signal, dict):
+        signal = cast("dict[str, Any]", signal)
+        y = signal.pop("f") if "f" in signal else numpy.fft.rfft(signal.pop("y"))
+        if "x" in signal:
+            x = signal.pop("x")
+        else:
+            length = 2 * (len(y) - 1)
+            rate = signal.pop("rate")
+            x = numpy.fft.rfftfreq(length, 1 / rate)
     else:
-        length = 2 * (len(y) - 1)
-        rate = signal.pop("rate")
-        x = numpy.fft.rfftfreq(length, 1 / rate)
+        y = numpy.fft.rfft(numpy.asarray(signal))
+        x = numpy.arange(len(y))
 
     if normalize:
         y = math.normalize(y)
     return x.astype(numpy.float32), math.decibel(y).astype(numpy.float32)
 
 
-def signal_waveform(
-    signal: dict[str, Any], normalize: bool = False
-) -> tuple[NDArray, NDArray]:
+def signal_waveform(signal: Signal, normalize: bool = False) -> tuple[NDArray, NDArray]:
     """Extract waveform from signal dictionary."""
-    y = signal.pop("y")
-    if "x" in signal:
-        x = signal.pop("x")
+    if isinstance(signal, dict):
+        signal = cast("dict[str, Any]", signal)
+        y = signal.pop("y")
+        if "x" in signal:
+            x = signal.pop("x")
+        else:
+            rate = signal.pop("rate")
+            x = numpy.linspace(0, len(y) / rate, len(y))
     else:
-        rate = signal.pop("rate")
-        x = numpy.linspace(0, len(y) / rate, len(y))
+        y = numpy.asarray(signal)
+        x = numpy.arange(len(y))
 
     if normalize:
         y = math.normalize(y)

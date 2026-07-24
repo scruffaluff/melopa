@@ -55,29 +55,25 @@ def _():
     delta_d[16] = 1
 
     return melopa.plot.gridplot([
-        melopa.plot.signal(
-            [
-                {"x": time_c, "y": sine_c, "legend_label": "Continuous"},
-                {
-                    "x": time_d,
-                    "y": sine_d,
-                    "legend_label": "Discrete",
-                    "method": "scatter",
-                },
-            ],
+        melopa.plot.waveform(
+            {"x": time_c, "y": sine_c, "legend_label": "Continuous"},
+            {
+                "x": time_d,
+                "y": sine_d,
+                "legend_label": "Discrete",
+                "method": "scatter",
+            },
             title="Sine",
             y_range=(-1.1, 1.1),
         ),
-        melopa.plot.signal(
-            [
-                {"x": time_c, "y": delta_c, "legend_label": "Continuous"},
-                {
-                    "x": time_d,
-                    "y": delta_d,
-                    "legend_label": "Discrete",
-                    "method": "scatter",
-                },
-            ],
+        melopa.plot.waveform(
+            {"x": time_c, "y": delta_c, "legend_label": "Continuous"},
+            {
+                "x": time_d,
+                "y": delta_d,
+                "legend_label": "Discrete",
+                "method": "scatter",
+            },
             title="Impulse",
             y_range=(-1.1, 1.1),
         ),
@@ -148,7 +144,7 @@ output
 ```
 
 ```python {.marimo}
-waveform_plot = melopa.plot.signal([{"x": time, "y": waveform}], title="Sine Signal")
+waveform_plot = melopa.plot.waveform({"x": time, "y": waveform}, title="Sine Signal")
 spectrum_plot = melopa.plot.figure(
     title="Fourier Transform",
     x_axis_label="Frequency (Hz)",

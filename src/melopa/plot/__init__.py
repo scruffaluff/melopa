@@ -5,9 +5,11 @@ from typing import Any, NamedTuple, cast
 
 import marimo
 from marimo import Html
+from numpy.typing import ArrayLike
 
 from melopa.plot import bokeh, matplotlib
 from melopa.plot.bokeh import figure, gridplot
+from melopa.plot.util import Signal
 
 __all__ = ["bokeh", "figure", "gridplot", "matplotlib"]
 __version__ = "0.1.0"
@@ -46,6 +48,97 @@ class Config(NamedTuple):
     overlay: bool = True
 
 
+def line(
+    *signals: ArrayLike,
+    backend: str = "bokeh",
+    overlay: bool = True,
+    x: ArrayLike | None = None,
+    **kwargs: Any,
+) -> Html:
+    """Plot audio waveform."""
+    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
+    plot = module.line(*signals, overlay=overlay, x=x, **kwargs)
+    return cast("Html", plot)
+
+
+def phase(
+    *signals: Signal,
+    backend: str = "bokeh",
+    overlay: bool = True,
+    **kwargs: Any,
+) -> Html:
+    """Plot audio phase."""
+    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
+    plot = module.phase(*signals, overlay=overlay, **kwargs)
+    return cast("Html", plot)
+
+
+def signal(
+    *signals: Signal,
+    backend: str = "bokeh",
+    kind: str = "waveform",
+    normalize: bool = False,
+    overlay: bool = True,
+    **kwargs: Any,
+) -> Html:
+    """Plot audio signals.
+
+    Raises:
+        ValueError: If kind value is invalid.
+    """
+    match kind.lower():
+        case "phase":
+            plot = phase(*signals, backend=backend, overlay=overlay, **kwargs)
+        case "spectrogram":
+            plot = spectrogram(*signals, backend=backend, normalize=normalize, **kwargs)
+        case "spectrum":
+            plot = spectrum(
+                *signals,
+                backend=backend,
+                normalize=normalize,
+                overlay=overlay,
+                **kwargs,
+            )
+        case "waveform":
+            plot = waveform(
+                *signals,
+                backend=backend,
+                normalize=normalize,
+                overlay=overlay,
+                **kwargs,
+            )
+        case _:
+            message = f"Invalid choice '{kind}' for PlotKind."
+            raise ValueError(message)
+
+    return plot
+
+
+def spectrogram(
+    *signals: Signal,
+    backend: str = "bokeh",
+    normalize: bool = False,
+    **kwargs: Any,
+) -> Html:
+    """Plot audio spectrogram."""
+    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
+    plot = module.spectrogram(*signals, normalize=normalize, **kwargs)
+    return cast("Html", plot)
+
+
+def spectrum(
+    *signals: Signal,
+    backend: str = "bokeh",
+    normalize: bool = False,
+    overlay: bool = True,
+    **kwargs: Any,
+) -> Html:
+    """Plot audio spectrum."""
+    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
+    plot = module.spectrum(*signals, normalize=normalize, overlay=overlay, **kwargs)
+    return cast("Html", plot)
+
+
 def ui(
     backend: str = "Bokeh", kind: str = "Waveform", overlay: bool = True
 ) -> marimo.ui.batch:
@@ -76,32 +169,14 @@ def ui(
     )
 
 
-def signal(
-    signals: list[dict],
+def waveform(
+    *signals: Signal,
     backend: str = "bokeh",
-    kind: str = "waveform",
     normalize: bool = False,
     overlay: bool = True,
     **kwargs: Any,
 ) -> Html:
-    """Plot audio signals.
-
-    Raises:
-        ValueError: If kind value is invalid.
-    """
+    """Plot audio waveform."""
     module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
-
-    match kind.lower():
-        case "phase":
-            plot = module.phase(signals, overlay, **kwargs)
-        case "spectrogram":
-            plot = module.spectrogram(signals, normalize, **kwargs)
-        case "spectrum":
-            plot = module.spectrum(signals, normalize, overlay, **kwargs)
-        case "waveform":
-            plot = module.waveform(signals, normalize, overlay, **kwargs)
-        case _:
-            message = f"Invalid choice '{kind}' for PlotKind."
-            raise ValueError(message)
-
+    plot = module.waveform(*signals, normalize=normalize, overlay=overlay, **kwargs)
     return cast("Html", plot)

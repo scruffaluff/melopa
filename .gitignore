@@ -18,7 +18,6 @@
 .hypothesis/
 .ipynb_checkpoints/
 .mypy_cache/
-.pdbrc
 .pytest_cache/
 .ruff_cache/
 .tox/

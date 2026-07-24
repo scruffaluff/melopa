@@ -5,6 +5,7 @@
 set script-interpreter := ["nu"]
 set shell := ["nu", "--commands"]
 export DENO_INSTALL_ROOT := justfile_directory() / ".vendor/lib/deno"
+export MARIMO_SKIP_UPDATE_CHECK := "1"
 export PATH := if os() == "windows" {
   justfile_directory() / ".vendor/bin;" + justfile_directory() /
   ".vendor/lib/deno/bin;" + env("PATH")
@@ -64,6 +65,14 @@ lint +paths=".":
 [default]
 @list:
   just --list
+
+# Launch module as Marimo notebook.
+[script]
+note module:
+  let temp = mktemp --dry --tmpdir --suffix ".py"
+  uv run marimo convert --output $temp '{{module}}'
+  try { uv run marimo --yes edit $temp } finally { rm $temp }
+
 
 # Run Nushell in project environment.
 [no-exit-message]

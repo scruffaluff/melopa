@@ -45,13 +45,10 @@ processed = scipy.signal.sosfilt(filter, signal)
 ```
 
 ```python {.marimo}
-melopa.plot.signal(
-    [
-        {"rate": rate, "y": signal, "legend_label": "original"},
-        {"rate": rate, "y": processed, "legend_label": "processed"},
-    ],
+melopa.plot.waveform(
+    {"rate": rate, "y": signal, "legend_label": "original"},
+    {"rate": rate, "y": processed, "legend_label": "processed"},
     backend="bokeh",
-    kind="waveform",
     overlay=True,
 )
 ```

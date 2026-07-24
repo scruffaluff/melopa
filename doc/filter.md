@@ -74,10 +74,8 @@ maf_output
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": maf_rate, "y": maf_signal, "legend_label": "original"},
-        {"rate": maf_rate, "y": maf_processed, "legend_label": "filtered"},
-    ],
+    {"rate": maf_rate, "y": maf_signal, "legend_label": "original"},
+    {"rate": maf_rate, "y": maf_processed, "legend_label": "filtered"},
     title=maf_signal_source.name(),
     **maf_plot_ui.value,
 )
@@ -114,10 +112,9 @@ de_matrix
 de_freq, de_amp = scipy.signal.freqz(
     de_matrix.value[0], de_matrix.value[1], 1000, fs=de_rate
 )
-melopa.plot.signal(
-    [{"x": de_freq, "f": de_amp}],
+melopa.plot.spectrum(
+    {"x": de_freq, "f": de_amp},
     backend="matplotlib",
-    kind="spectrum",
     normalize=True,
     y_range=(-50, 0),
 )
@@ -165,10 +162,9 @@ bwf_freq, bwf_amp = scipy.signal.freqz(bwf_b, bwf_a, 1_000, fs=bwf_rate)
 ```
 
 ```python {.marimo}
-melopa.plot.signal(
-    [{"x": bwf_freq, "f": bwf_amp}],
+melopa.plot.spectrum(
+    {"x": bwf_freq, "f": bwf_amp},
     backend="matplotlib",
-    kind="spectrum",
     normalize=True,
     y_range=(-100, 0),
 )
@@ -189,10 +185,8 @@ mo.right(bw_plot_ui)
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": bw_rate, "y": bw_signal, "legend_label": "original"},
-        {"rate": bw_rate, "y": bw_processed, "legend_label": "processed"},
-    ],
+    {"rate": bw_rate, "y": bw_signal, "legend_label": "original"},
+    {"rate": bw_rate, "y": bw_processed, "legend_label": "processed"},
     **bw_plot_ui.value,
 )
 ```
@@ -237,10 +231,8 @@ mo.right(ap_plot_ui)
 
 ```python {.marimo}
 melopa.plot.signal(
-    [
-        {"rate": ap_rate, "y": ap_signal, "legend_label": "original"},
-        {"rate": ap_rate, "y": ap_processed, "legend_label": "processed"},
-    ],
+    {"rate": ap_rate, "y": ap_signal, "legend_label": "original"},
+    {"rate": ap_rate, "y": ap_processed, "legend_label": "processed"},
     **ap_plot_ui.value,
 )
 ```
