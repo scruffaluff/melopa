@@ -16,15 +16,15 @@ dev = [
   "pytest-mock~=3.15",
   "python-lsp-server~=1.14",
   "pyzmq~=27.1",
-  "ruff~=0.15.18",
-  "ty~=0.0.62",
+  "ruff~=0.16.0",
+  "ty~=0.0.72",
 ]
 
 [project]
 # Dependency constraints must be flexible for WASM compatibility with Micropip.
 dependencies = [
   "bokeh~=3.9",
-  "marimo~=0.23.14",
+  "marimo~=0.24.0",
   "matplotlib~=3.10",
   "numpy~=2.4",
   "polars~=1.33",
@@ -85,26 +85,28 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 flake8-annotations = { allow-star-arg-any = true }
-pydocstyle = { convention = "google" }
 ignore = [
-
-  "COM", # Rule conflicts with formatter.
-  "missing-copyright-notice", # There should not a copyright notice in every module.
-  "docstring-missing-returns", # Not every function docstring needs a returns section.
-  "docstring-missing-yields", # Not every generator docstring needs a yields section.
-  "shebang-missing-python", # Uv should be shebang executor.
+  "COM", # Flake8 comma lints conflict with formatter.
+  "CPY001", # Copyright notices are not required.
+  "DOC201", # Not all docstrings should require a returns section.
+  "E402", # Code is required before imports to test standalone scripts.
+  "E731", # Lambda statements sometimes increase readability.
+  "EXE003", # Uv should be shebang executor.
   "FBT", # Boolean function arguments are acceptable.
   "FIX", # Todo comments are acceptable.
   "ICN", # Import abbreviations reduce readability.
-  "magic-value-comparison", # Constant numerical comparisons are often readable.
-  "non-empty-init-module", # Init modules should be able to contain code.
-  "assert", # Assert statements are standard for test functions.
-  "subprocess-without-shell-equals-true", # Rule warns about using subprocess commands without a solution.
-  "start-process-with-partial-path", # Partial paths for process executables is more cross platform.
-  "print", # Print statements are acceptable for CLI applications.
-  "p-print", # Print statements are acceptable for CLI applications.
+  "PLR2004", # Constant numerical comparisons are often readable.
+  "RUF201", # Ruff rule codes in configuration files are readable.
+  "RUF067", # Init modules should allow code designed for export.
+  "S101", # Assert statements are standard for test functions.
+  "S603", # Subprocess commands are acceptable.
+  "S607", # Partial paths for process executables is more cross platform.
+  "SIM105", # Try except pass blocks are faster than contextlib supress.
+  "T201", # Print statements are acceptable for CLI applications.
+  "T203", # Print statements are acceptable for CLI applications.
   "TD", # Todo formatting is excessive for personal projects.
 ]
+pydocstyle = { convention = "google" }
 select = ["ALL"]
 
 [tool.ty]
