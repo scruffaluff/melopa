@@ -93,6 +93,8 @@ class SourceFile(Source):
             "gowers-amen_break.wav",
             "hallkev-timpani_roll.wav",
             "mefrancis13-crowded_room.wav",
+            "mozart-nachtmusik.wav",
+            "mozart-symphony_40.wav",
             "realwisut1993-snare_midlow.wav",
             "talitha5-cafe_ambience.wav",
             "templeofhades-scratch_sample.wav",
