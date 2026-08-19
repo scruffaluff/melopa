@@ -87,19 +87,19 @@ class SourceFile(Source):
     def list(cls) -> list[str]:
         """Find included audio files."""
         return [
-            "claretcanelon-baby_parrot.wav",
-            "dwsd-kick_laid.wav",
-            "esperar-chicken_imitation.wav",
-            "gowers-amen_break.wav",
-            "hallkev-timpani_roll.wav",
-            "mefrancis13-crowded_room.wav",
-            "mozart-nachtmusik.wav",
-            "mozart-symphony_40.wav",
-            "realwisut1993-snare_midlow.wav",
-            "talitha5-cafe_ambience.wav",
-            "templeofhades-scratch_sample.wav",
-            "unfa-fail_jingle.wav",
-            "zuluonedrop-drum_fill.wav",
+            "claretcanelon-baby_parrot.flac",
+            "dwsd-kick_laid.flac",
+            "esperar-chicken_imitation.flac",
+            "gowers-amen_break.flac",
+            "hallkev-timpani_roll.flac",
+            "mefrancis13-crowded_room.flac",
+            "mozart-nachtmusik.flac",
+            "mozart-symphony_40.flac",
+            "realwisut1993-snare_midlow.flac",
+            "talitha5-cafe_ambience.flac",
+            "templeofhades-scratch_sample.flac",
+            "unfa-fail_jingle.flac",
+            "zuluonedrop-drum_fill.flac",
         ]
 
     def name(self) -> str:
@@ -401,7 +401,7 @@ def ui(default: str) -> tuple[State[Source], Html]:
         value=None,
     )
     upload = marimo.ui.file(
-        filetypes=[".wav"],
+        filetypes=[".flac"],
         kind="button",
         label="Upload File",
         on_change=lambda input_: set_file(SourceInput(input_[0])),

@@ -45,7 +45,7 @@ def moving_average(signal: NDArray, length: int) -> NDArray:
     filter = numpy.ones(length) / length
     return numpy.convolve(filter, signal, mode="same")
 """)
-maf_signal_state, maf_signal_ui = melopa.source.ui("claretcanelon-baby_parrot.wav")
+maf_signal_state, maf_signal_ui = melopa.source.ui("claretcanelon-baby_parrot.flac")
 maf_length_ui = mo.ui.slider(
     1, 100, 1, debounce=True, label="Length", show_value=True, value=8
 )
@@ -173,7 +173,7 @@ melopa.plot.spectrum(
 We can apply the low-pass filter to any sound and visualized its affects below.
 
 ```python {.marimo}
-bw_signal, bw_rate = SourceFile("talitha5-cafe_ambience.wav").read()
+bw_signal, bw_rate = SourceFile("talitha5-cafe_ambience.flac").read()
 bw_sos = scipy.signal.butter(10, 1000, "lowpass", fs=bw_rate, output="sos")
 bw_processed = scipy.signal.sosfilt(bw_sos, bw_signal)
 ```
@@ -220,7 +220,7 @@ stateDiagram
 
 ```python {.marimo}
 ap_a = 0.1
-ap_signal, ap_rate = SourceFile("dwsd-kick_laid.wav").read()
+ap_signal, ap_rate = SourceFile("dwsd-kick_laid.flac").read()
 ap_processed = scipy.signal.lfilter([1 - ap_a], [1, ap_a], ap_signal)
 ```
 

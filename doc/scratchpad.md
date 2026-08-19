@@ -38,7 +38,7 @@ import melopa
 ```
 
 ```python {.marimo}
-source = melopa.source.select("gowers-amen_break.wav")
+source = melopa.source.select("gowers-amen_break.flac")
 signal, rate = source.read()
 filter = scipy.signal.butter(4, 600, "highpass", fs=rate, output="sos")
 processed = scipy.signal.sosfilt(filter, signal)

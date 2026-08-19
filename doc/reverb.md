@@ -160,7 +160,7 @@ def reverb(signal: NDArray, wet: float = 0.5) -> NDArray:
 
 ```python {.marimo}
 editor_ui = melopa.ui.editor(code)
-signal_state, signal_ui = melopa.source.ui("esperar-chicken_imitation.wav")
+signal_state, signal_ui = melopa.source.ui("esperar-chicken_imitation.flac")
 wet_ui = mo.ui.slider(
     0, 1, 0.01, debounce=True, label="Wet", show_value=True, value=0.5
 )

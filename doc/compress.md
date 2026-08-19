@@ -73,7 +73,7 @@ The algorithm is implemented with the following editable code.
 editor_ui = melopa.ui.editor(
     melopa.code.compress, melopa.code.gain_compute, melopa.code.level_detect
 )
-signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
+signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.flac")
 attack_ui = mo.ui.slider(
     0, 100, 1, debounce=True, label="Attack", show_value=True, value=0
 )

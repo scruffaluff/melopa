@@ -47,7 +47,7 @@ the speed of the signal as shown below.
 
 ```python {.marimo}
 editor_ui = melopa.ui.editor(melopa.code.resample)
-signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.wav")
+signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.flac")
 ratio_ui = mo.ui.slider(
     debounce=True,
     label="Ratio",
