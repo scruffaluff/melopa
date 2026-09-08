@@ -22,15 +22,15 @@
 .ruff_cache/
 .tox/
 .ty_cache/
+.vendor/
 .venv/
 .vscode/
 .zed/
-/.vendor/
-/build/
 Pipfile
 Pipfile.lock
 __marimo__/
 __pycache__/
+build/
 dist/
 environment.yml
 f1
