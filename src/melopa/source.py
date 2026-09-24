@@ -19,6 +19,9 @@ from numpy.typing import NDArray
 
 from melopa import math, util
 
+if sys.platform == "emscripten":
+    import js
+
 random = numpy.random.default_rng()
 
 
@@ -118,7 +121,7 @@ class SourceFile(Source):
             raise FileNotFoundError(message)
 
         if sys.platform == "emscripten":
-            url = str(folder / f"data/audio/{self._file}")
+            url = f"{js.location.origin}/melopa/data/audio/{self._file}"
             content = BytesIO(request.urlopen(url).read())  # ruff:ignore[suspicious-url-open-usage]
             signal, rate = soundfile.read(content)
         else:

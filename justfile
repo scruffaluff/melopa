@@ -30,6 +30,7 @@ build:
     uv run jinja2 --strict --outfile build/site/index.html doc/index.html.j2
     $temp
   )
+  rm --force $temp
   (
     minhtml --minify-css --minify-js --output build/site/index.html
     build/site/index.html
@@ -76,7 +77,6 @@ note module:
   let temp = mktemp --dry --tmpdir --suffix ".py"
   uv run marimo convert --output $temp '{{module}}'
   try { uv run marimo --yes edit $temp } finally { rm $temp }
-
 
 # Run Nushell in project environment.
 [no-exit-message]
@@ -186,7 +186,7 @@ test: test-js test-py
 
 # Run JavaScripts.
 test-js +args='run':
-  deno run --allow-all npm:vitest {{args}}
+  deno run --allow-all --node-modules-dir=none npm:vitest {{args}}
 
 # Run Python tests (use DEBUG=1 for debugger).
 [script]

@@ -22,7 +22,7 @@
 .ruff_cache/
 .tox/
 .ty_cache/
-.vendor/
+/.vendor/
 .venv/
 .vscode/
 .zed/
@@ -30,8 +30,8 @@ Pipfile
 Pipfile.lock
 __marimo__/
 __pycache__/
-build/
-dist/
+/build/
+/dist/
 environment.yml
 f1
 flit.ini
@@ -42,5 +42,5 @@ poetry.lock
 requirements.lock
 requirements.txt
 setup.py
-site/
+/site/
 tmp/

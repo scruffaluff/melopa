@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.24.0
+marimo-version: 0.25.0
 title: Reverb
 width: medium
 ---
@@ -22,9 +22,13 @@ width: medium
 ```python {.marimo name="setup"}
 import sys
 
-await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
-) if sys.platform == "emscripten" else None
+if sys.platform == "emscripten":
+    import micropip
+    from js import location
+
+    await micropip.install(
+        f"{location.origin}/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    )
 
 import marimo as mo
 import numpy
