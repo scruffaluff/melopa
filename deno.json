@@ -1,0 +1,18 @@
+{
+  "allowScripts": [
+    "npm:@manzt/uv",
+    "npm:esbuild",
+    "npm:fsevents",
+    "npm:playwright-chromium"
+  ],
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "nodeModulesDir": "auto"
+}

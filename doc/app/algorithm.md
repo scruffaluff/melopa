@@ -19,11 +19,11 @@ width: medium
 
 # Algorithm
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import sys
 
 await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
 
 import marimo as mo
@@ -45,7 +45,7 @@ Similarly by zero padding after the upper frequencies, we increase the sampling
 rate. Playing back the resampled signal at the original sample rate will change
 the speed of the signal as shown below.
 
-```python {.marimo}
+```python {marimo}
 editor_ui = melopa.ui.editor(melopa.code.resample)
 signal_state, signal_ui = melopa.source.ui("templeofhades-scratch_sample.flac")
 ratio_ui = mo.ui.slider(
@@ -68,7 +68,7 @@ mo.ui.tabs(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 signal_source = signal_state()
 signal, rate = signal_source.read()
 exec(editor_ui.value["editor"])
@@ -76,7 +76,7 @@ processed, output = melopa.ui.run(lambda: resample(signal, ratio_ui.value))
 output
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.plot.signal(
     {"rate": rate, "y": signal, "legend_label": "original"},
     {"rate": rate, "y": processed, "legend_label": "processed"},
@@ -85,7 +85,7 @@ melopa.plot.signal(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.ui.audio_list([
     {"signal": signal, "rate": rate, "name": "Original"},
     {"signal": processed, "rate": rate, "name": "Processed"},

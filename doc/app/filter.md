@@ -6,6 +6,7 @@ header: |-
   #   "matplotlib~=3.10",
   #   "numpy~=2.4",
   #   "scipy~=1.17",
+  #   "wigglystuff~=0.5",
   # ]
   # requires-python = ">=3.12.0,<4.0.0"
   #
@@ -23,13 +24,14 @@ width: medium
 import sys
 
 await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
 
 import marimo as mo
 import numpy
 from numpy.typing import NDArray
 import scipy.signal
+from wigglystuff import Knob
 
 import melopa
 from melopa.source import SourceFile
@@ -149,14 +151,16 @@ bwf_cutoff_ui = mo.ui.slider(
     label="Cutoff",
     show_value=True,
 )
-bwf_order_ui = mo.ui.slider(1, 10, 1, label="Order", show_value=True, value=4)
+bwf_order_ui = mo.ui.anywidget(
+    Knob(min_value=1, max_value=10, step=1, label="Order", show_value=True, value=4)
+)
 mo.hstack([bwf_cutoff_ui, bwf_order_ui], justify="start", wrap=True)
 ```
 
 ```python {.marimo}
 bwf_rate = 40_000
 bwf_b, bwf_a = scipy.signal.butter(
-    bwf_order_ui.value, bwf_cutoff_ui.value, "lowpass", fs=bwf_rate
+    bwf_order_ui.value["value"], bwf_cutoff_ui.value, "lowpass", fs=bwf_rate
 )
 bwf_freq, bwf_amp = scipy.signal.freqz(bwf_b, bwf_a, 1_000, fs=bwf_rate)
 ```

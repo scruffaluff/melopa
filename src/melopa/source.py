@@ -121,11 +121,11 @@ class SourceFile(Source):
             raise FileNotFoundError(message)
 
         if sys.platform == "emscripten":
-            url = f"{js.location.origin}/melopa/data/audio/{self._file}"
+            url = f"{js.location.origin}/melopa/assets/audio/{self._file}"
             content = BytesIO(request.urlopen(url).read())  # ruff:ignore[suspicious-url-open-usage]
             signal, rate = soundfile.read(content)
         else:
-            path = util.repo_path() / f"data/audio/{self._file}"
+            path = util.repo_path() / f"doc/public/assets/audio/{self._file}"
             signal, rate = soundfile.read(path)
         if len(signal.shape) > 1:
             signal = numpy.mean(signal, axis=1)

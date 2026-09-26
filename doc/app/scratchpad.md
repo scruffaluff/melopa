@@ -19,11 +19,11 @@ marimo-version: 0.25.0
 width: medium
 ---
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import sys
 
 await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
 
 import bokeh
@@ -37,14 +37,14 @@ from matplotlib import pyplot
 import melopa
 ```
 
-```python {.marimo}
+```python {marimo}
 source = melopa.source.select("gowers-amen_break.flac")
 signal, rate = source.read()
 filter = scipy.signal.butter(4, 600, "highpass", fs=rate, output="sos")
 processed = scipy.signal.sosfilt(filter, signal)
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.plot.waveform(
     {"rate": rate, "y": signal, "legend_label": "original"},
     {"rate": rate, "y": processed, "legend_label": "processed"},
@@ -53,7 +53,7 @@ melopa.plot.waveform(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.ui.audio_list([
     {"signal": signal, "rate": rate, "name": "Original"},
     {"signal": processed, "rate": rate, "name": "Processed"},

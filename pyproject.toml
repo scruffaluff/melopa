@@ -30,8 +30,9 @@ dependencies = [
   "polars~=1.33",
   "scipy~=1.17",
   "soundfile~=0.12.0",
+  "wigglystuff~=0.5",
 ]
-description = "Interactive Python audio notebooks."
+description = "Scruffaluff wiki with slideshows, tutorials, and webapps."
 keywords = []
 name = "melopa"
 readme = "README.md"
@@ -65,6 +66,8 @@ formatting = { line_length = 80 }
 
 [tool.marimo.runtime]
 auto_instantiate = true
+auto_reload = "autorun"
+on_cell_change = "autorun"
 output_max_bytes = 1000000000
 skip_update_check = true
 
@@ -113,4 +116,5 @@ select = ["ALL"]
 terminal = { error-on-warning = true }
 
 [tool.uv.build-backend]
-source-exclude = ["*.test.ts", "*_test.py"]
+source-exclude = [".vendor/cache/**", "*.test.ts", "*_test.py"]
+wheel-exclude = [".vendor/cache/**", "*.test.ts", "*_test.py"]

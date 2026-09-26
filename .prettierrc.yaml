@@ -15,6 +15,12 @@ overrides:
     options:
       parser: jsonc
       trailingComma: none
+  - files:
+      - doc/slide/*.md
+    options:
+      parser: slidev
+      plugins:
+        - prettier-plugin-slidev
 printWidth: 80
 proseWrap: always
 semi: true

@@ -19,11 +19,11 @@ width: medium
 
 # Modulation
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import sys
 
 await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
 
 import marimo as mo
@@ -57,7 +57,7 @@ an acronym for its parameters of attack, decay, sustain, and release.
 
 An ADSR envelope is applied to a sawtooth wave in the section below.
 
-```python {.marimo}
+```python {marimo}
 adsr_attack_ui = mo.ui.slider(
     0,
     1,
@@ -110,7 +110,7 @@ mo.ui.tabs(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 adsr_source = SourceSawtooth(110)
 adsr_signal, adsr_rate = adsr_source.read()
 adsr_processed = melopa.modulate.adsr(
@@ -122,7 +122,7 @@ adsr_processed = melopa.modulate.adsr(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.plot.signal(
     {"rate": adsr_rate, "y": adsr_processed, "legend_label": "modulated"},
     title=adsr_source.name(),
@@ -130,7 +130,7 @@ melopa.plot.signal(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.ui.audio_list([
     {"signal": adsr_signal, "rate": adsr_rate, "name": "Original"},
     {"signal": adsr_processed, "rate": adsr_rate, "name": "Modulated"},
@@ -146,7 +146,7 @@ equation and its live demo describes an implementation of frequency modulation.
 
 $$ y[n] = \sin(2 \pi f n + m[n]) $$
 
-```python {.marimo}
+```python {marimo}
 fm_mod_ui = melopa.source.ui_synth("sine")
 fm_amp_ui = mo.ui.slider(
     debounce=True,
@@ -185,7 +185,7 @@ mo.ui.tabs(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 fm_mod_source = fm_mod_ui.value(freq=fm_freq_mod_ui.value)
 fm_mod, fm_rate = fm_mod_source.read()
 fm_time = numpy.linspace(0, 1, len(fm_mod))
@@ -195,7 +195,7 @@ fm_processed = melopa.math.normalize(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.plot.signal(
     {"rate": fm_rate, "y": fm_processed, "legend_label": "modulated"},
     title="Sine",
@@ -203,7 +203,7 @@ melopa.plot.signal(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.ui.audio_list([
     {"signal": fm_signal, "rate": adsr_rate, "name": "Carrier"},
     {"signal": fm_processed, "rate": fm_rate, "name": "Modulated"},

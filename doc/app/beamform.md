@@ -19,7 +19,7 @@ width: medium
 
 # Beamforming
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import marimo as mo
 ```
 

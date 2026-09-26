@@ -1,4 +1,4 @@
-"""Collection of interactive Python audio notebooks."""
+"""Scruffaluff wiki with slideshows, tutorials, and webapps."""
 
 from melopa import code, math, modulate, plot, source, ui, util
 
