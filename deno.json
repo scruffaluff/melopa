@@ -1,0 +1,17 @@
+{
+  "allowScripts": [
+    "npm:@manzt/uv@0.8.13",
+    "npm:esbuild@0.21.5",
+    "npm:fsevents@2.3.3"
+  ],
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "nodeModulesDir": "auto"
+}

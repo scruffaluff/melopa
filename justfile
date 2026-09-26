@@ -21,47 +21,57 @@ export UV_TOOL_DIR := justfile_directory() / ".vendor/lib/uv/tool"
 # Build project for release.
 [script]
 build:
-  let notebooks = ls doc/*.md | get name | path relative-to doc
-  let temp = mktemp --dry --tmpdir --suffix .json
-  {"notebooks": $notebooks} | save $temp
-  mkdir build/site/data
+  mkdir doc/public/data doc/public/lib doc/site/note doc/site/slide
+  cp --recursive data/audio doc/public/data/
   uv build --out-dir build/dist
+  cp build/dist/melopa-*-py3-none-any.whl doc/public/lib/
+  let notes = ls doc/note/*.md | get name | path relative-to doc/note
   (
-    uv run jinja2 --strict --outfile build/site/index.html doc/index.html.j2
-    $temp
+    {"notes": $notes} | to json | uv run jinja2 --strict --outfile
+    doc/site/note/index.md doc/note/index.md.j2
   )
-  rm --force $temp
-  (
-    minhtml --minify-css --minify-js --output build/site/index.html
-    build/site/index.html
-  )
-  (
-    cp --recursive data/audio build/dist/melopa-*-py3-none-any.whl
-    build/site/data/
-  )
-  for notebook in $notebooks {
-    let subpath = $notebook | path parse | get stem
+  for note in $notes {
+    let subpath = $note | path parse | get stem
     let mode = if $subpath == "scratchpad" { "edit" } else { "run" }
-    let html = $"build/site/($subpath).html"
+    let html = $"doc/public/note/($subpath).html"
     (
       uv run marimo --yes export html-wasm --mode $mode --output $html
-      $"doc/($notebook)"
+      $"doc/note/($note)"
     )
     minhtml  --minify-css --minify-js --output $html $html
   }
-  rm --force --recursive build/site/files build/site/CLAUDE.md
+  rm --force --recursive doc/public/note/files doc/public/note/CLAUDE.md
+  let slides = ls doc/slide/*.md | get name | path relative-to doc/slide
+  (
+    {"slides": $slides} | to json | uv run jinja2 --strict --outfile
+    doc/site/slide/index.md doc/slide/index.md.j2
+  )
+  for slide in $slides {
+    let route = $slide | str replace --regex "(.+).md" "$1"
+    (
+      deno run --allow-all npm:@slidev/cli build --base
+      $"/melopa/slide/($route)/" --out $"../public/slide/($route)"
+      $"doc/slide/($slide)"
+    )
+  }
+  deno run --allow-all npm:vitepress build
 
 # Run continuous integration pipeline.
 ci: setup lint test build
 
+# Run Deno in project environment.
+[no-exit-message]
+@deno *args:
+  deno {{args}}
+
 # Format project files.
 format +paths=".":
-  prettier --write {{paths}}
+  deno run --allow-all npm:prettier --write {{paths}}
   uv run ruff format {{paths}}
 
 # Analyze files for issues.
 lint +paths=".":
-  prettier --check {{paths}}
+  deno run --allow-all npm:prettier --check {{paths}}
   uv run ruff format --check {{paths}}
   uv run ruff check {{paths}}
   uv run ty check {{paths}}
@@ -71,26 +81,26 @@ lint +paths=".":
 @list:
   just --list
 
-# Launch module as Marimo notebook.
-[script]
-note module:
-  let temp = mktemp --dry --tmpdir --suffix ".py"
-  uv run marimo convert --output $temp '{{module}}'
-  try { uv run marimo --yes edit $temp } finally { rm $temp }
+# Run project notebooks.
+[no-exit-message]
+note +paths="doc/note":
+  uv run marimo --yes edit --no-sandbox --watch {{paths}}
 
 # Run Nushell in project environment.
 [no-exit-message]
 @nu *args="nu --login":
   nu --commands "{{args}}"
 
-# Run project notebooks.
+# Run project website.
 [no-exit-message]
-run +paths="doc":
-  uv run marimo --yes edit --no-sandbox --watch {{paths}}
+run *args:
+  deno run --allow-all npm:vitepress dev {{args}}
 
 # Serve built website.
-serve *flags: build
-  miniserve --route-prefix /melopa build/site {{flags}}
+serve *args: build
+  # Miniserve is used since vitepress serve command incorrectly returns audio
+  # files. Issue does not occur for vitepress dev command.
+  miniserve --route-prefix /melopa build/site {{args}}
 
 # Install development tools and dependencies.
 [script]
@@ -136,22 +146,19 @@ setup: _setup
     }
   }
   print $"Using (miniserve --version)."
-  if (which prettier | is-empty) {
-    print "Installing Prettier."
-    deno install --allow-all --global npm:prettier
-  }
-  print $"Using Prettier (prettier --version)."
   if (which uv | is-empty) {
     print "Installing Uv."
     http get https://scruffaluff.github.io/picoware/install/uv.nu
     | nu --commands $in --preserve-env --dest .vendor/bin
   }
   print $"Using (uv --version)."
-  print "Installing Python packages with Uv."
+  print "Installing packages with Deno and Uv."
   if ($env.INIT? | into bool --relaxed) {
+    deno install
     uv sync
     just format
   } else {
+    deno install --frozen
     uv sync --locked
   }
 
@@ -181,12 +188,18 @@ _setup:
   }
   Write-Output "Using Nushell $(nu --version)."
 
+# Run project slideshows.
+[script]
+slide slide:
+  let route = "{{slide}}" | str replace --regex ".*doc/(.+).md" "$1"
+  deno run --allow-all npm:@slidev/cli --base $"/melopa/($route)/" "{{slide}}"
+
 # Run tests (use DEBUG=1 for debugger).
 test: test-js test-py
 
-# Run JavaScripts.
+# Run JavaScript tests.
 test-js +args='run':
-  deno run --allow-all --node-modules-dir=none npm:vitest {{args}}
+  deno run --allow-all npm:vitest --dir src {{args}}
 
 # Run Python tests (use DEBUG=1 for debugger).
 [script]

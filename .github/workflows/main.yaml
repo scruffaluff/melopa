@@ -50,6 +50,7 @@ jobs:
           path: |
             .vendor
             .venv
+            node_modules
       - name: Install Just
         run: >-
           curl -LSfs https://scruffaluff.github.io/picoware/install/just.sh | sh
@@ -82,6 +83,7 @@ jobs:
           path: |
             .vendor
             .venv
+            node_modules
       - name: Install Just
         run: >-
           curl -LSfs https://scruffaluff.github.io/picoware/install/just.sh | sh

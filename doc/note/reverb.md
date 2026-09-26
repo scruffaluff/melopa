@@ -27,7 +27,7 @@ if sys.platform == "emscripten":
     from js import location
 
     await micropip.install(
-        f"{location.origin}/melopa/data/melopa-0.1.0-py3-none-any.whl"
+        f"{location.origin}/melopa/lib/melopa-0.1.0-py3-none-any.whl"
     )
 
 import marimo as mo
@@ -48,11 +48,11 @@ sound to drop by 60 decibels from its initial value.
 
 ## Moorer Algorithm
 
-We start our reverb analysis by implementing an algorithm by James Moorer [[1]](#r1).
-His algorithm splits reverberation into distincter early reflections and less
-distinct late reflections. The early reflections are modeled by a series of
-delays and the late reflections are modeled by a comb filter. These reflections
-are then added back into the signal.
+We start our reverb analysis by implementing an algorithm by James Moorer
+[[1]](#r1). His algorithm splits reverberation into distincter early reflections
+and less distinct late reflections. The early reflections are modeled by a
+series of delays and the late reflections are modeled by a comb filter. These
+reflections are then added back into the signal.
 
 The algorithm logic is encapsulated in the block diagram below.
 

@@ -24,7 +24,7 @@ import math
 import sys
 
 await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
 
 import bokeh
@@ -37,8 +37,8 @@ import melopa
 
 A digital audio signal is a representation of sound as a sequence of numbers
 denoted as $x[n]$. Digital audio signals can be generated from continuous analog
-signals by discretely recording them at a sampling frequency $F$. We can view
-a comparison between analog and digital signals in the sine and impulse plots
+signals by discretely recording them at a sampling frequency $F$. We can view a
+comparison between analog and digital signals in the sine and impulse plots
 below.
 
 ```python {.marimo}
@@ -86,7 +86,8 @@ _()
 ## System
 
 A digital system $T$ is a function that maps an input signal $x[n]$ to an output
-signal $y[n]$. The system equation is conventionally written as $y[n] = T(x[n])$ and described in a block diagram as follows.
+signal $y[n]$. The system equation is conventionally written as $y[n] = T(x[n])$
+and described in a block diagram as follows.
 
 ```python {.marimo}
 mo.mermaid("""
@@ -101,10 +102,10 @@ stateDiagram
 """)
 ```
 
-The class of linear and time invariant (LTI) systems are often used in digital audio
-processing for their properties. Each LTI system $T$ in this class can be
-written as a convolution of its impulse response $h[n]$, i.e. its output to
-the impulse signal, as follows.
+The class of linear and time invariant (LTI) systems are often used in digital
+audio processing for their properties. Each LTI system $T$ in this class can be
+written as a convolution of its impulse response $h[n]$, i.e. its output to the
+impulse signal, as follows.
 
 $$ T(x[n]) = \sum_{k=-\infty}^{\infty} x[n] h[n-k] = x[n] * h[n] $$
 
@@ -186,8 +187,8 @@ system are the roots of the denominator.
 
 The discrete Fourier transform decomposes the entire signal into frequency
 components. If we want to analyze the change in frequency components over time,
-then we can use the [discrete short-time Fourier
-transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform#Discrete-time_STFT)
+then we can use the
+[discrete short-time Fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform#Discrete-time_STFT)
 (STFT). The STFT divides the Fourier transform input into time segments by using
 a window function $w[m]$. The Guassian windo
 

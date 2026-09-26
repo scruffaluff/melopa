@@ -23,7 +23,7 @@ width: medium
 import sys
 
 await __import__("micropip").install(
-    "/melopa/data/melopa-0.1.0-py3-none-any.whl"
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
 ) if sys.platform == "emscripten" else None
 
 import marimo as mo
@@ -45,15 +45,15 @@ current volume of the signal and then uses the following parameters.
   samples above the threshold.
 - _Attack (A)_ controls how quickly compression is applied after going above the
   threshold.
-- _Release (L)_ controls how quickly compression is stopped after going below the
-  threshold.
+- _Release (L)_ controls how quickly compression is stopped after going below
+  the threshold.
 - _Knee (K)_ softens the threshold transition by rounding its edge.
 - _Gain (G)_ applies additional volume to the signal after compression and
   compensates for the reduction in signal amplitude.
 
 The compression algorithm is commonly split into two routines, level detection
-and gain computer. The level detector routine measures the volume of the signal to
-find when the threshold has been crossed.
+and gain computer. The level detector routine measures the volume of the signal
+to find when the threshold has been crossed.
 
 The gain computer routine determines how to scale the signal after the level
 detector finds a threshold crossing. Its algorithm is described by the following
@@ -170,8 +170,8 @@ melopa.ui.audio_list([
 
 ## References
 
-<span id="r1">[1]</span> Giannoulis, Dimitrios & Massberg, Michael & Reiss, Joshua.
-(2012).
+<span id="r1">[1]</span> Giannoulis, Dimitrios & Massberg, Michael & Reiss,
+Joshua. (2012).
 [Digital Dynamic Range Compressor Design—A Tutorial and Analysis](https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysis).
 AES: Journal of the Audio Engineering Society. 60.
 

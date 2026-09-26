@@ -1,0 +1,15 @@
+# Notebooks
+
+<!--- Custom href logic is required to reprevent VitePress from intercepting
+the link to Marimo and sending the user to a not found page. -->
+{% if notes %}
+<ul>
+  {% for note in notes %}
+  <li>
+    <a href="javascript:window.location.href='/melopa/note/{{ note | replace('.md', '.html') }}'">
+      {{ note | replace('.md', '')  | replace('_', ' ') | title }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

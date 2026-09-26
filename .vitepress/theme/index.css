@@ -1,0 +1,25 @@
+/* https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css. */
+
+:root {
+  --vp-c-blue: #45b6f2;
+  --vp-c-purple: #c084fc;
+  --vp-c-brand: var(--vp-c-purple);
+  --vp-font-family-base: Fira Sans;
+  --vp-font-family-mono: Fira Code;
+}
+
+.marimo-island-host {
+  --marimo-island-accent-foreground: var(--vp-button-brand-text);
+  --marimo-island-accent: var(--vp-c-brand-1);
+  --marimo-island-background: var(--vp-c-bg);
+  --marimo-island-border: var(--vp-c-divider);
+  --marimo-island-code-background: var(--vp-code-block-bg);
+  --marimo-island-code-foreground: var(--vp-c-text-1);
+  --marimo-island-focus-ring: var(--vp-c-brand-2);
+  --marimo-island-foreground: var(--vp-c-text-1);
+  --marimo-island-margin-block: 1rem;
+  --marimo-island-muted-foreground: var(--vp-c-text-2);
+  --marimo-island-muted-surface: var(--vp-c-bg-soft);
+  --marimo-island-radius: 6px;
+  --marimo-island-surface: var(--vp-c-bg-elv);
+}
