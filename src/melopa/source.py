@@ -404,7 +404,6 @@ def ui(default: str) -> tuple[State[Source], Html]:
         value=None,
     )
     upload = marimo.ui.file(
-        filetypes=[".flac"],
         kind="button",
         label="Upload File",
         on_change=lambda input_: set_file(SourceInput(input_[0])),

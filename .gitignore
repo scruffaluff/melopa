@@ -39,6 +39,8 @@
 /doc/public/app/
 /doc/public/lib/
 /doc/public/slide/
+/doc/site/app/
+/doc/site/slide/
 /site/
 Pipfile
 Pipfile.lock

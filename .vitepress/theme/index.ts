@@ -24,7 +24,12 @@ import "@fontsource/fira-sans/900-italic.css";
 import "@marimo-team/mdx-marimo/element/auto";
 import DefaultTheme from "vitepress/theme-without-fonts";
 import "./index.css";
+import type { Theme } from "vitepress";
+import VitePressMermaid from "../plugins/vitepress-mermaid/index.vue";
 
 export default {
   extends: DefaultTheme,
-};
+  enhanceApp({ app }) {
+    app.component("vitepress-mermaid", VitePressMermaid);
+  },
+} satisfies Theme;

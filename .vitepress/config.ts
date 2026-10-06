@@ -9,6 +9,7 @@ import { fileURLToPath, URL } from "node:url";
 import { marimoVitePress } from "@marimo-team/mdx-marimo/vitepress";
 import { defineConfig } from "vitepress";
 import { generateSidebar } from "vitepress-sidebar";
+import { mermaidPlugin } from "./plugins/vitepress-mermaid";
 
 export default defineConfig({
   base: "/melopa/",
@@ -45,6 +46,7 @@ export default defineConfig({
           }
         }
       });
+      md.use(mermaidPlugin);
     },
     math: true,
   },

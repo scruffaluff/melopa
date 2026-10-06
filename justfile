@@ -186,6 +186,7 @@ setup: _setup
     deno install --frozen
     uv sync --locked
   }
+  deno run --allow-all npm:playwright install chromium
 
 [unix]
 _setup:
