@@ -1,11 +1,11 @@
 """Plotting interfaces."""
 
+import functools
 from enum import StrEnum
 from typing import Any, NamedTuple, cast
 
 import marimo
 from marimo import Html
-from numpy.typing import ArrayLike
 
 from melopa.plot import bokeh, matplotlib
 from melopa.plot.bokeh import figure, gridplot
@@ -34,9 +34,11 @@ class Backend(Options):
 class Kind(Options):
     """Plot types."""
 
+    Frequency = "frequency"
+    Grid = "grid"
+    Line = "line"
     Phase = "phase"
     Spectrogram = "spectrogram"
-    Spectrum = "spectrum"
     Waveform = "waveform"
 
 
@@ -48,36 +50,11 @@ class Config(NamedTuple):
     overlay: bool = True
 
 
-def line(
-    *signals: ArrayLike,
-    backend: str = "bokeh",
-    overlay: bool = True,
-    x: ArrayLike | None = None,
-    **kwargs: Any,
-) -> Html:
-    """Plot audio waveform."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
-    plot = module.line(*signals, overlay=overlay, x=x, **kwargs)
-    return cast("Html", plot)
-
-
-def phase(
-    *signals: Signal,
-    backend: str = "bokeh",
-    overlay: bool = True,
-    **kwargs: Any,
-) -> Html:
-    """Plot audio phase."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
-    plot = module.phase(*signals, overlay=overlay, **kwargs)
-    return cast("Html", plot)
-
-
 def signal(
     *signals: Signal,
     backend: str = "bokeh",
+    depth: int = 4,
     kind: str = "waveform",
-    normalize: bool = False,
     overlay: bool = True,
     **kwargs: Any,
 ) -> Html:
@@ -86,24 +63,27 @@ def signal(
     Raises:
         ValueError: If kind value is invalid.
     """
+    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
     match kind.lower():
-        case "phase":
-            plot = phase(*signals, backend=backend, overlay=overlay, **kwargs)
-        case "spectrogram":
-            plot = spectrogram(*signals, backend=backend, normalize=normalize, **kwargs)
-        case "spectrum":
-            plot = spectrum(
+        case "frequency":
+            plot = module.frequency(
                 *signals,
-                backend=backend,
-                normalize=normalize,
+                depth=depth,
                 overlay=overlay,
                 **kwargs,
             )
+        case "grid":
+            plot = module.grid(*signals, depth=depth, overlay=overlay, **kwargs)
+        case "line":
+            plot = module.line(*signals, depth=depth, overlay=overlay, **kwargs)
+        case "phase":
+            plot = module.phase(*signals, depth=depth, overlay=overlay, **kwargs)
+        case "spectrogram":
+            plot = module.spectrogram(*signals, depth=depth, **kwargs)
         case "waveform":
-            plot = waveform(
+            plot = module.waveform(
                 *signals,
-                backend=backend,
-                normalize=normalize,
+                depth=depth,
                 overlay=overlay,
                 **kwargs,
             )
@@ -111,31 +91,6 @@ def signal(
             message = f"Invalid choice '{kind}' for PlotKind."
             raise ValueError(message)
 
-    return plot
-
-
-def spectrogram(
-    *signals: Signal,
-    backend: str = "bokeh",
-    normalize: bool = False,
-    **kwargs: Any,
-) -> Html:
-    """Plot audio spectrogram."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
-    plot = module.spectrogram(*signals, normalize=normalize, **kwargs)
-    return cast("Html", plot)
-
-
-def spectrum(
-    *signals: Signal,
-    backend: str = "bokeh",
-    normalize: bool = False,
-    overlay: bool = True,
-    **kwargs: Any,
-) -> Html:
-    """Plot audio spectrum."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
-    plot = module.spectrum(*signals, normalize=normalize, overlay=overlay, **kwargs)
     return cast("Html", plot)
 
 
@@ -169,14 +124,9 @@ def ui(
     )
 
 
-def waveform(
-    *signals: Signal,
-    backend: str = "bokeh",
-    normalize: bool = False,
-    overlay: bool = True,
-    **kwargs: Any,
-) -> Html:
-    """Plot audio waveform."""
-    module = {"bokeh": bokeh, "matplotlib": matplotlib}[backend.lower()]
-    plot = module.waveform(*signals, normalize=normalize, overlay=overlay, **kwargs)
-    return cast("Html", plot)
+frequency = functools.partial(signal, kind=Kind.Frequency)
+grid = functools.partial(signal, kind=Kind.Grid)
+line = functools.partial(signal, kind=Kind.Line)
+phase = functools.partial(signal, kind=Kind.Phase)
+spectrogram = functools.partial(signal, kind=Kind.Spectrogram)
+waveform = functools.partial(signal, kind=Kind.Waveform)

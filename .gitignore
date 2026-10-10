@@ -21,6 +21,7 @@
 .ipynb_checkpoints/
 .marimo-*
 .mypy_cache/
+.playwright-cli/
 .pnpm-store/
 .pytest_cache/
 .ruff_cache/

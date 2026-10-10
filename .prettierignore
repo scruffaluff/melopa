@@ -19,6 +19,7 @@
 .ipynb_checkpoints/
 .localized
 .mypy_cache/
+.playwright-cli/
 .pnpm-store/
 .pytest_cache/
 .ruff_cache/

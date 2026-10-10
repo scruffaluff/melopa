@@ -26,7 +26,7 @@ build: _build-app _build-slide
 [script]
 _build-app: _build-lib
   mkdir doc/site/app
-  let apps = ls doc/app/*.md | get name | path relative-to doc/app
+  let apps = glob doc/app/*.md | path relative-to $"(pwd)/doc/app"
   (
     {"apps": $apps} | to json | uv run jinja2 --strict --outfile
     doc/site/app/index.md doc/app/index.md.j2
@@ -63,7 +63,7 @@ _build-lib:
 [script]
 _build-slide:
   mkdir doc/site/slide
-  let slides = ls doc/slide/*.md | get name | path relative-to doc/slide
+  let slides = glob doc/slide/*.md | path relative-to $"(pwd)/doc/slide"
   (
     {"slides": $slides} | to json | uv run jinja2 --strict --outfile
     doc/site/slide/index.md doc/slide/index.md.j2
