@@ -26,7 +26,7 @@ build: _build-app _build-slide
 [script]
 _build-app: _build-lib
   mkdir doc/site/app
-  let apps = glob doc/app/*.md | path relative-to $"(pwd)/doc/app"
+  let apps = glob doc/app/*.md | path relative-to $"(pwd)/doc/app" | sort
   (
     {"apps": $apps} | to json | uv run jinja2 --strict --outfile
     doc/site/app/index.md doc/app/index.md.j2
@@ -50,8 +50,8 @@ _build-app: _build-lib
   }
   (
     rm --force --recursive doc/public/app/*.png doc/public/app/.nojekyll
-    doc/public/app/CLAUDE.md doc/public/app/favicon.ico
-    doc/public/app/manifest.json doc/public/app/site.webmanifest
+    doc/public/app/CLAUDE.md doc/public/app/manifest.json
+    doc/public/app/site.webmanifest
   )
 
 [script]
@@ -63,7 +63,7 @@ _build-lib:
 [script]
 _build-slide:
   mkdir doc/site/slide
-  let slides = glob doc/slide/*.md | path relative-to $"(pwd)/doc/slide"
+  let slides = glob doc/slide/*.md | path relative-to $"(pwd)/doc/slide" | sort
   (
     {"slides": $slides} | to json | uv run jinja2 --strict --outfile
     doc/site/slide/index.md doc/slide/index.md.j2
