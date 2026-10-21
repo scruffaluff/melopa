@@ -13,14 +13,14 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.25.0
+marimo-version: 0.25.2
 title: Filter
 width: medium
 ---
 
 # Filter
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import sys
 
 await __import__("micropip").install(
@@ -76,8 +76,8 @@ maf_output
 
 ```python {marimo}
 melopa.plot.signal(
-    {"rate": maf_rate, "y": maf_signal, "legend_label": "original"},
-    {"rate": maf_rate, "y": maf_processed, "legend_label": "filtered"},
+    {"rate": maf_rate, "y": maf_signal, "label": "original"},
+    {"rate": maf_rate, "y": maf_processed, "label": "filtered"},
     title=maf_signal_source.name(),
     **maf_plot_ui.value,
 )
@@ -189,8 +189,8 @@ mo.right(bw_plot_ui)
 
 ```python {marimo}
 melopa.plot.signal(
-    {"rate": bw_rate, "y": bw_signal, "legend_label": "original"},
-    {"rate": bw_rate, "y": bw_processed, "legend_label": "processed"},
+    {"rate": bw_rate, "y": bw_signal, "label": "original"},
+    {"rate": bw_rate, "y": bw_processed, "label": "processed"},
     **bw_plot_ui.value,
 )
 ```
@@ -235,8 +235,8 @@ mo.right(ap_plot_ui)
 
 ```python {marimo}
 melopa.plot.signal(
-    {"rate": ap_rate, "y": ap_signal, "legend_label": "original"},
-    {"rate": ap_rate, "y": ap_processed, "legend_label": "processed"},
+    {"rate": ap_rate, "y": ap_signal, "label": "original"},
+    {"rate": ap_rate, "y": ap_processed, "label": "processed"},
     **ap_plot_ui.value,
 )
 ```

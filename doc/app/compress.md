@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.25.0
+marimo-version: 0.25.1
 title: Compression
 width: medium
 ---
@@ -140,12 +140,12 @@ melopa.plot.signal(
     {
         "rate": rate,
         "y": numpy.power(10, reduction / 20),
-        "legend_label": "reduction",
+        "label": "reduction",
     },
     {
         "rate": rate,
         "y": numpy.power(10, level / 20),
-        "legend_label": "level",
+        "label": "level",
     },
     title=signal_source.name(),
     **plot_ui.value,
@@ -154,8 +154,8 @@ melopa.plot.signal(
 
 ```python {marimo}
 melopa.plot.signal(
-    {"rate": rate, "y": signal, "legend_label": "original"},
-    {"rate": rate, "y": processed, "legend_label": "compressed"},
+    {"rate": rate, "y": signal, "label": "original"},
+    {"rate": rate, "y": processed, "label": "compressed"},
     title=signal_source.name(),
     **plot_ui.value,
 )

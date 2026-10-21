@@ -15,7 +15,7 @@ header: |-
   # melopa = { editable = true, path = "src/melopa" }
   # ///
 title: Scratchpad
-marimo-version: 0.25.0
+marimo-version: 0.25.2
 width: medium
 ---
 
@@ -46,8 +46,8 @@ processed = scipy.signal.sosfilt(filter, signal)
 
 ```python {marimo}
 melopa.plot.waveform(
-    {"rate": rate, "y": signal, "legend_label": "original"},
-    {"rate": rate, "y": processed, "legend_label": "processed"},
+    {"rate": rate, "y": signal, "label": "original"},
+    {"rate": rate, "y": processed, "label": "processed"},
     backend="bokeh",
     overlay=True,
 )

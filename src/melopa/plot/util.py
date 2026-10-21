@@ -160,7 +160,10 @@ def sigdata(
     for index, signal in enumerate(signals):
         if isinstance(signal, dict):
             signal = cast("dict[str, Any]", signal)
-            y = math.mono(numpy.asarray(signal.pop("y")))
+            if "f" in signal:
+                values = {"f": math.mono(numpy.asarray(signal.pop("f")))}
+            else:
+                values = {"y": math.mono(numpy.asarray(signal.pop("y")))}
             x_ = signal.pop("x", x)
             color = melopa.util.popall(signal, ["color", "c"], next(palette))
             label = melopa.util.popall(
@@ -170,7 +173,7 @@ def sigdata(
             )
             data = {
                 **signal,
-                "y": y,
+                **values,
                 "color": color,
                 "label": label,
             }

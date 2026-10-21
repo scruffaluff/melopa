@@ -16,8 +16,12 @@ const publicDir = fileURLToPath(new URL("../public", import.meta.url));
 // Uses "\0" convention to prevent other plugins from processing as explained at
 // https://rolldown.rs/apis/plugin-api#virtual-modules.
 function publicAssets(): Plugin {
+  let base: string;
   const prefix = "/melopa/";
   return {
+    configResolved(config) {
+      base = config.base;
+    },
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const url = request.url?.split("?")[0];
@@ -63,6 +67,17 @@ function publicAssets(): Plugin {
         return;
       }
       return `\0${id}`;
+    },
+    transformIndexHtml(html) {
+      if (base && base !== "/" && html.includes(`${base}${prefix.slice(1)}`)) {
+        return {
+          html: html.replace(
+            new RegExp(`${base}${prefix.slice(1)}`, "g"),
+            prefix
+          ),
+          tags: [],
+        };
+      }
     },
     name: "melopa:public-assets",
   };

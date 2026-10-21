@@ -12,7 +12,7 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.25.0
+marimo-version: 0.25.2
 title: Signal
 width: medium
 ---
@@ -56,22 +56,22 @@ def _():
 
     return melopa.plot.gridplot([
         melopa.plot.waveform(
-            {"x": time_c, "y": sine_c, "legend_label": "Continuous"},
+            {"x": time_c, "y": sine_c, "label": "Continuous"},
             {
                 "x": time_d,
                 "y": sine_d,
-                "legend_label": "Discrete",
+                "label": "Discrete",
                 "method": "scatter",
             },
             title="Sine",
             y_range=(-1.1, 1.1),
         ),
         melopa.plot.waveform(
-            {"x": time_c, "y": delta_c, "legend_label": "Continuous"},
+            {"x": time_c, "y": delta_c, "label": "Continuous"},
             {
                 "x": time_d,
                 "y": delta_d,
-                "legend_label": "Discrete",
+                "label": "Discrete",
                 "method": "scatter",
             },
             title="Impulse",

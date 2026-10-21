@@ -65,7 +65,7 @@ def figure(*args: Any, title: str | None = None, **kwargs: Any) -> plotting.figu
     return figure_
 
 
-def frequency(
+def frequency(  # ruff: ignore[too-many-locals]
     *signals: Signal,
     depth: int = 3,
     overlay: bool = True,
@@ -87,9 +87,14 @@ def frequency(
     for data in sigdata(signals, x=x, depth=depth):
         color = data["color"]
         label = data["label"]
-        rate_ = rate or data.get("rate", len(data["y"]))
-        y = scale(numpy.abs(numpy.fft.rfft(data["y"])))
-        x_ = data.get("x", numpy.fft.rfftfreq(len(data["y"]), 1 / rate_))
+        if "f" in data:
+            y = data["f"]
+            length = len(y)
+        else:
+            y = scale(numpy.abs(numpy.fft.rfft(data["y"])))
+            length = len(data["y"])
+        rate_ = rate or data.get("rate", length)
+        x_ = data.get("x", numpy.fft.rfftfreq(length, 1 / rate_))
         x_range += (x_[0], x_[-1])
         y_range += (y.min(), y.max())
         source = ColumnDataSource(data={"x": x_, "y": y})
@@ -120,7 +125,7 @@ def frequency(
             x="x",
             y="y",
             color=color,
-            label=label,
+            legend_label=label,
             line_width=2,
             source=source,
         )
@@ -145,6 +150,7 @@ def frequency(
 
 def grid(
     *signals: Signal,
+    depth: int = 4,
     overlay: bool = True,
     plots: list[str] | None = None,
     rate: int | None = None,
@@ -168,6 +174,7 @@ def grid(
         if "frequency".startswith(plot_name):
             panel = frequency(
                 *signals,
+                depth=depth,
                 overlay=overlay,
                 rate=rate,
                 scale=scale,
@@ -178,6 +185,7 @@ def grid(
         elif "line".startswith(plot_name):
             panel = line(
                 *signals,
+                depth=depth,
                 overlay=overlay,
                 scale=scale,
                 size=size,
@@ -187,6 +195,7 @@ def grid(
         elif "phase".startswith(plot_name):
             panel = phase(
                 *signals,
+                depth=depth,
                 overlay=overlay,
                 rate=rate,
                 size=size,
@@ -198,6 +207,7 @@ def grid(
         elif "waveform".startswith(plot_name):
             panel = waveform(
                 *signals,
+                depth=depth,
                 overlay=overlay,
                 rate=rate,
                 scale=scale,
@@ -233,6 +243,7 @@ def gridplot(plots: list[plotting.figure]) -> Pane:
 
 def line(
     *signals: Signal,
+    depth: int = 3,
     overlay: bool = True,
     scale: Scale = Scale.Linear,
     size: int = PLOT_SIZE,
@@ -246,7 +257,7 @@ def line(
     plots: list[plotting.figure] = []
     x_range, y_range, _ = util.axis_ranges(kwargs)
 
-    for data in sigdata(signals, x=x, depth=3):
+    for data in sigdata(signals, x=x, depth=depth):
         color = data["color"]
         label = data["label"]
         y = scale(data["y"])
@@ -269,7 +280,7 @@ def line(
             x="x",
             y="y",
             color=color,
-            label=label,
+            legend_label=label,
             line_width=2,
             source=source,
         )
@@ -295,6 +306,7 @@ def line(
 
 def phase(
     *signals: Signal,
+    depth: int = 3,
     overlay: bool = True,
     rate: int | None = None,
     size: int = PLOT_SIZE,
@@ -309,7 +321,7 @@ def phase(
     ticks = util.spectrum_ticks()
     x_range, y_range, _ = util.axis_ranges(kwargs, x_range=(20, 20_000))
 
-    for data in sigdata(signals, x=x, depth=3):
+    for data in sigdata(signals, x=x, depth=depth):
         color = data["color"]
         label = data["label"]
         rate_ = rate or data.get("rate", len(data["y"]))
@@ -345,7 +357,7 @@ def phase(
             x="x",
             y="y",
             color=color,
-            label=label,
+            legend_label=label,
             line_width=2,
             source=source,
         )
@@ -522,7 +534,7 @@ def waveform(
             x="x",
             y="y",
             color=color,
-            label=label,
+            legend_label=label,
             line_width=2,
             source=source,
         )

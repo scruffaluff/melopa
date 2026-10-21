@@ -73,7 +73,7 @@ def signal(
                 **kwargs,
             )
         case "grid":
-            plot = module.grid(*signals, depth=depth, overlay=overlay, **kwargs)
+            plot = module.grid(*signals, depth=depth + 1, overlay=overlay, **kwargs)
         case "line":
             plot = module.line(*signals, depth=depth, overlay=overlay, **kwargs)
         case "phase":

@@ -57,9 +57,14 @@ def frequency(
     datas = sigdata(signals, x=x, depth=depth)
 
     for index, data in enumerate(datas):
-        rate_ = rate or data.pop("rate", len(data["y"]))
-        y = scale(numpy.abs(numpy.fft.rfft(data["y"])))
-        x_ = data.pop("x", numpy.fft.rfftfreq(len(data["y"]), 1 / rate_))
+        if "f" in data:
+            y = data["f"]
+            length = len(y)
+        else:
+            y = scale(numpy.abs(numpy.fft.rfft(data["y"])))
+            length = len(data["y"])
+        rate_ = rate or data.get("rate", length)
+        x_ = data.get("x", numpy.fft.rfftfreq(length, 1 / rate_))
         x_range += (x_[0], x_[-1])
         y_range += (y.min(), y.max())
 
