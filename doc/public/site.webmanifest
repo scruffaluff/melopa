@@ -1,28 +1,28 @@
 {
   "background_color": "#ffffff",
-  "description": "Collection of interactive Python audio notebooks",
+  "description": "Scruffaluff wiki with slideshows, tutorials, and webapps.",
   "display": "standalone",
   "icons": [
     {
-      "src": "/pwa-192x192.png",
+      "src": "/melopa/pwa-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/pwa-512x512.png",
+      "src": "/melopa/pwa-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/pwa-maskable-192x192.png",
+      "src": "/melopa/pwa-maskable-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/pwa-maskable-512x512.png",
+      "src": "/melopa/pwa-maskable-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

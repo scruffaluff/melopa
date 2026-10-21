@@ -12,23 +12,19 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.25.0
+marimo-version: 0.25.2
 title: Reverb
 width: medium
 ---
 
 # Reverb
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import sys
 
-if sys.platform == "emscripten":
-    import micropip
-    from js import location
-
-    await micropip.install(
-        f"{location.origin}/melopa/data/melopa-0.1.0-py3-none-any.whl"
-    )
+await __import__("micropip").install(
+    "/melopa/lib/melopa-0.1.0-py3-none-any.whl"
+) if sys.platform == "emscripten" else None
 
 import marimo as mo
 import numpy
@@ -56,7 +52,7 @@ are then added back into the signal.
 
 The algorithm logic is encapsulated in the block diagram below.
 
-```python {.marimo}
+```python {marimo}
 mo.mermaid("""
 ---
 config:
@@ -86,7 +82,7 @@ graph LR
 """)
 ```
 
-```python {.marimo}
+```python {marimo}
 code = f"""
 def allpass(signal: NDArray, delay: int, gain: float) -> NDArray:
     B = numpy.zeros(delay)
@@ -162,7 +158,7 @@ def reverb(signal: NDArray, wet: float = 0.5) -> NDArray:
 """
 ```
 
-```python {.marimo}
+```python {marimo}
 editor_ui = melopa.ui.editor(code)
 signal_state, signal_ui = melopa.source.ui("esperar-chicken_imitation.flac")
 wet_ui = mo.ui.slider(
@@ -180,7 +176,7 @@ mo.ui.tabs(
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 signal_source = signal_state()
 signal, rate = signal_source.read()
 exec(editor_ui.value["editor"])
@@ -188,16 +184,16 @@ processed, output = melopa.ui.run(lambda: reverb(signal, wet=wet_ui.value))
 output
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.plot.signal(
-    {"rate": rate, "y": signal, "legend_label": "original"},
-    {"rate": rate, "y": processed, "legend_label": "reverbed"},
+    {"rate": rate, "y": signal, "label": "original"},
+    {"rate": rate, "y": processed, "label": "reverbed"},
     title=signal_source.name(),
     **plot_ui.value,
 )
 ```
 
-```python {.marimo}
+```python {marimo}
 melopa.ui.audio_list([
     {"signal": signal, "rate": rate, "name": "Original"},
     {"signal": processed, "rate": rate, "name": "Reverbed"},

@@ -2,16 +2,17 @@
 
 import dataclasses
 import itertools
-from typing import Any, Self, cast
+from collections.abc import Iterable
+from enum import Enum
+from typing import Any, Self, Union, cast
 
 import numpy
-from bokeh.palettes import Category10
-from numpy.typing import ArrayLike, NDArray
-from scipy.signal import ShortTimeFFT
+from numpy.typing import NDArray
 
+import melopa.util
 from melopa import math
 
-type Signal = ArrayLike | dict[str, Any]
+type Signal = NDArray | tuple[NDArray, NDArray] | dict[str, Any]
 
 
 @dataclasses.dataclass
@@ -32,6 +33,69 @@ class Range:
     def valid(self) -> bool:
         """Check if bounds are valid."""
         return self.start < self.stop
+
+
+class Scale(Enum):
+    """Signal amplitude scale."""
+
+    Decibel = "decibel"
+    FullScale = "fullscale"
+    Linear = "linear"
+    Normalized = "normalized"
+
+    def __call__(self, array: NDArray) -> NDArray:
+        """Transform array to scale."""
+        if self == Scale.Decibel:
+            return math.decibel(array)
+        if self == Scale.FullScale:
+            return math.decibel(math.normalize(array))
+        if self == Scale.Normalized:
+            return math.normalize(array)
+        return array
+
+    def __str__(self) -> str:
+        """Get string representation."""
+        return self.value
+
+    def axis(self) -> str:
+        """Get axis scale."""
+        return {
+            Scale.Decibel: "log",
+            Scale.FullScale: "log",
+            Scale.Linear: "linear",
+            Scale.Normalized: "linear",
+        }[self]
+
+    @classmethod
+    def from_prefix(cls, value: Union[str, "Scale"]) -> "Scale":
+        """Create Scale instance from value prefix.
+
+        Raises:
+            ValueError: For invalid value.
+        """
+        if isinstance(value, Scale):
+            return value
+
+        value_ = value.lower()
+        if "decibel".startswith(value_) or value_ == "db":
+            return cls.Decibel
+        if "fullscale".startswith(value_) or value_ == "dbfs":
+            return cls.FullScale
+        if "linear".startswith(value_):
+            return cls.Linear
+        if "normalized".startswith(value_):
+            return cls.Normalized
+        msg = f"Invalid scale value '{value}'"
+        raise ValueError(msg)
+
+    def unit(self) -> str:
+        """Get plot axis label unit."""
+        return {
+            Scale.Decibel: " (dB)",
+            Scale.FullScale: " (dBFS)",
+            Scale.Linear: "",
+            Scale.Normalized: "",
+        }[self]
 
 
 def axis_ranges(
@@ -65,100 +129,76 @@ def axis_ranges(
 
 
 def palette_cycle() -> itertools.cycle:
-    """Create a cycle of colors for plotting."""
-    return itertools.cycle(Category10[10])
+    """Create a cycle of colors for plotting.
+
+    Based on D3's Category10 palette,
+    https://d3js.org/d3-scale-chromatic/categorical#schemeCategory10.
+    """
+    return itertools.cycle((
+        "#1f77b4",
+        "#ff7f0e",
+        "#2ca02c",
+        "#d62728",
+        "#9467bd",
+        "#8c564b",
+        "#e377c2",
+        "#7f7f7f",
+        "#bcbd22",
+        "#17becf",
+    ))
 
 
-def signal_phase(signal: Signal) -> tuple[NDArray, NDArray]:
-    """Extract frequency phase from signal dictionary."""
-    if isinstance(signal, dict):
-        signal = cast("dict[str, Any]", signal)
-        if "f" in signal:
-            y = signal.pop("f")
+def sigdata(
+    signals: Iterable[Signal],
+    x: NDArray | None = None,
+    depth: int = 3,
+) -> list[dict[str, Any]]:
+    """Convert signal into standardized format."""
+    palette = palette_cycle()
+
+    datas = []
+    for index, signal in enumerate(signals):
+        if isinstance(signal, dict):
+            signal = cast("dict[str, Any]", signal)
+            if "f" in signal:
+                values = {"f": math.mono(numpy.asarray(signal.pop("f")))}
+            else:
+                values = {"y": math.mono(numpy.asarray(signal.pop("y")))}
+            x_ = signal.pop("x", x)
+            color = melopa.util.popall(signal, ["color", "c"], next(palette))
+            label = melopa.util.popall(
+                signal,
+                ["label", "l"],
+                melopa.util.varname(signal, str(index), depth=depth),
+            )
+            data = {
+                **signal,
+                **values,
+                "color": color,
+                "label": label,
+            }
+            if x_ is not None:
+                data["x"] = math.mono(numpy.asarray(x_))
+        elif isinstance(signal, tuple):
+            signal = cast("tuple[NDArray, NDArray]", signal)
+            x_, y = signal
+            data = {
+                "x": math.mono(numpy.asarray(x_)),
+                "y": math.mono(numpy.asarray(y)),
+                "color": next(palette),
+                "label": melopa.util.varname(signal, str(index), depth=depth),
+            }
         else:
-            y_ = signal.pop("y")
-            y = numpy.unwrap(numpy.angle(numpy.fft.rfft(y_)))
-
-        if "x" in signal:
-            x = signal.pop("x")
-        else:
-            length = 2 * (len(y) - 1)
-            rate = signal.pop("rate")
-            x = numpy.fft.rfftfreq(length, 1 / rate)
-    else:
-        y = numpy.asarray(signal)
-        x = numpy.arange(len(y))
-
-    return x.astype(numpy.float32), y.astype(numpy.float32)
-
-
-def signal_spectrogram(
-    signal: Signal, normalize: bool = False
-) -> tuple[NDArray, NDArray, NDArray]:
-    """Extract time binned frequency spectrum from signal dictionary."""
-    if isinstance(signal, dict):
-        signal = cast("dict[str, Any]", signal)
-        y_ = signal.pop("y")
-        rate = signal.pop("rate")
-    else:
-        y_ = numpy.asarray(signal)
-        rate = 1
-    length = len(y_)
-
-    transform = ShortTimeFFT.from_window(
-        ("gaussian", 1e-2 * rate),
-        fft_mode="onesided",
-        fs=rate,
-        noverlap=64,
-        nperseg=512,
-    )
-    bounds = transform.extent(length, center_bins=True)
-
-    z = transform.stft(y_)
-    if normalize:
-        z = math.normalize(z)
-    x = numpy.linspace(bounds[0], bounds[1], num=z.shape[1], dtype=numpy.float32)
-    y = numpy.linspace(bounds[2], bounds[3], num=z.shape[0], dtype=numpy.float32)
-    return x, y, math.decibel(z).astype(numpy.float32)
-
-
-def signal_spectrum(signal: Signal, normalize: bool = False) -> tuple[NDArray, NDArray]:
-    """Extract frequency spectrum from signal dictionary."""
-    if isinstance(signal, dict):
-        signal = cast("dict[str, Any]", signal)
-        y = signal.pop("f") if "f" in signal else numpy.fft.rfft(signal.pop("y"))
-        if "x" in signal:
-            x = signal.pop("x")
-        else:
-            length = 2 * (len(y) - 1)
-            rate = signal.pop("rate")
-            x = numpy.fft.rfftfreq(length, 1 / rate)
-    else:
-        y = numpy.fft.rfft(numpy.asarray(signal))
-        x = numpy.arange(len(y))
-
-    if normalize:
-        y = math.normalize(y)
-    return x.astype(numpy.float32), math.decibel(y).astype(numpy.float32)
-
-
-def signal_waveform(signal: Signal, normalize: bool = False) -> tuple[NDArray, NDArray]:
-    """Extract waveform from signal dictionary."""
-    if isinstance(signal, dict):
-        signal = cast("dict[str, Any]", signal)
-        y = signal.pop("y")
-        if "x" in signal:
-            x = signal.pop("x")
-        else:
-            rate = signal.pop("rate")
-            x = numpy.linspace(0, len(y) / rate, len(y))
-    else:
-        y = numpy.asarray(signal)
-        x = numpy.arange(len(y))
-
-    if normalize:
-        y = math.normalize(y)
-    return x.astype(numpy.float32), y.astype(numpy.float32)
+            y = math.mono(numpy.asarray(signal))
+            data = {
+                "y": y,
+                "color": next(palette),
+                "label": melopa.util.varname(signal, str(index), depth=depth),
+            }
+            if x is not None:
+                data["x"] = math.mono(numpy.asarray(x))
+        datas.append(data)
+    return datas
 
 
 def spectrum_ticks() -> tuple[list[float], list[str]]:

@@ -14,6 +14,15 @@ def decibel(signal: NDArray) -> NDArray:
     return 20 * numpy.log10(amplitude)
 
 
+def mono(array: NDArray) -> NDArray:
+    """Average 2 dimensional array into 1 dimension."""
+    if array.ndim == 1:
+        return array
+    if array.shape[0] < array.shape[1]:
+        return array.mean(axis=0)
+    return array.mean(axis=1)
+
+
 def normalize(signal: NDArray) -> NDArray:
     """Scale signal to -1 and +1 range."""
     maximum = numpy.abs(signal).max()

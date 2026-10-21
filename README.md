@@ -1,4 +1,4 @@
 # Melopa
 
-Melopa is my collection of interactive Python audio notebooks hosted at
+Melopa is the Scruffaluff wiki with slideshows, tutorials, and webapps hosted at
 https://scruffaluff.github.io/melopa.

@@ -2,7 +2,7 @@
 
 const repo = path self | path dirname --num-levels 2
 
-for file in (ls $"($repo)/data/audio" | get name) {
+for file in (ls $"($repo)/doc/public/assets/audio" | get name) {
     let parts = $file | path parse
     if $parts.extension != "flac" {
         let output = $"($parts.parent)/($parts.stem).flac"

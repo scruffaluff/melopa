@@ -1,0 +1,15 @@
+# Webapps
+
+<!--- Custom href logic is required to reprevent VitePress from intercepting
+the link to Marimo and sending the user to a not found page. -->
+{% if apps %}
+<ul>
+  {% for app in apps %}
+  <li>
+    <a href="javascript:window.location.href='/melopa/app/{{ app | replace('.md', '.html') }}'">
+      {{ app | replace('.md', '')  | replace('_', ' ') | title }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

@@ -1,0 +1,15 @@
+# Slides
+
+<!--- Custom href logic is required to reprevent VitePress from intercepting
+the link to Slidev and sending the user to a not found page. -->
+{% if slides %}
+<ul>
+  {% for slide in slides %}
+  <li>
+    <a href="javascript:window.location.href='/melopa/slide/{{ slide | replace('.md', '') }}/'">
+      {{ slide | replace('.md', '')  | replace('_', ' ') | title }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

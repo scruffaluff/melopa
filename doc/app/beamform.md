@@ -12,14 +12,14 @@ header: |-
   # [tool.uv.sources]
   # melopa = { editable = true, path = "src/melopa" }
   # ///
-marimo-version: 0.25.0
+marimo-version: 0.25.2
 title: Beamforming
 width: medium
 ---
 
 # Beamforming
 
-```python {.marimo name="setup"}
+```python {marimo name="setup"}
 import marimo as mo
 ```
 
