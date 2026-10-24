@@ -104,3 +104,40 @@ jobs:
         name: Launch Tmate session if debug enabled
         timeout-minutes: 60
         uses: mxschmitt/action-tmate@v3
+
+  release:
+    if: >-
+      ${{ github.ref_type == 'tag' && github.event_name != 'workflow_dispatch'
+      || inputs.job == 'release' }}
+    name: Make GitHub release
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Just
+        run: >-
+          curl -LSfs https://scruffaluff.github.io/picoware/install/just.sh | sh
+          -s -- --global
+      - name: Build Python package
+        run: just setup build
+      - name: Publish package
+        env:
+          UV_PUBLISH_TOKEN: "${{ secrets.UV_PUBLISH_TOKEN }}"
+        run: just uv publish build/dist/melopa-*
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          body: >-
+            See the [changelog](https://github.com/scruffaluff/melopa/blob/${{
+            github.ref_name }}/CHANGELOG.md) for more information.
+          files: |
+            build/dist/melpa-${{ github.ref_name }}-py3-none-any.whl
+            build/dist/melpa-${{ github.ref_name }}.tar.gz
+          name: Melopa ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+      - if: ${{ always() && inputs.debug }}
+        name: Launch Tmate session if debug enabled
+        timeout-minutes: 60
+        uses: mxschmitt/action-tmate@v3

@@ -12,7 +12,6 @@ from melopa.plot.bokeh import figure, gridplot
 from melopa.plot.util import Signal
 
 __all__ = ["bokeh", "figure", "gridplot", "matplotlib"]
-__version__ = "0.1.0"
 
 
 class Options(StrEnum):
